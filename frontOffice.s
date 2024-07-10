@@ -6,9 +6,16 @@ MAPPER_HI = 0 ; Mapper id, indicate alternate platforms.
 PPU_CONTROLLER_ADDR = $2000
 PPU_MASK_ADDR = $2001
 PPU_STATUS_ADDR = $2002
+PPU_OAM_ADDR = $2003
 PPU_SCROLL_ADDR = $2005
 PPU_ADDR_ADDR = $2006
 PPU_DATA_ADDR = $2007
+PPU_OAM_DMA = $4014
+
+PPU_CONTROLLER_ENABLE_NMI = %10000000
+
+PPU_MASK_RENDER_SPRITES = %00010000
+PPU_MASK_RENDER_BACKGROUND = %00001000
 
 PPU_PALETTE_ADDR_HI = $3F
 
@@ -17,6 +24,7 @@ API_STATUS_ADDR = $4015
 APU_FRAME_COUNTER_ADDR = $4017
 
 COLOR_BLACK = $0F
+COLOR_BLUE = $22
 COLOR_PINK = $25
 
 .segment "HEADER"
@@ -80,16 +88,16 @@ reset:
         bit PPU_STATUS_ADDR
         bpl :-
 
-    lda #%10000000
+    lda #PPU_CONTROLLER_ENABLE_NMI 
     sta PPU_CONTROLLER_ADDR ; Enable NMIs.
 
-    lda #%00001010
+    lda #(PPU_MASK_RENDER_SPRITES | PPU_MASK_RENDER_BACKGROUND)
     sta PPU_MASK_ADDR ; Enable rendering.
 
     ; Set palette.
     lda #PPU_PALETTE_ADDR_HI 
     sta PPU_ADDR_ADDR
-    lda #$00
+    lda #$00 ; Background palette 0.
     sta PPU_ADDR_ADDR
 
     lda #COLOR_BLACK
@@ -98,12 +106,34 @@ reset:
     lda #COLOR_PINK
     sta PPU_DATA_ADDR
 
+    lda #PPU_PALETTE_ADDR_HI
+    sta PPU_ADDR_ADDR
+    lda #$15 ; Sprite palette 1.
+    sta PPU_ADDR_ADDR
+
+    lda #COLOR_BLUE
+    STA PPU_DATA_ADDR
+
+    ; Draw sprite 0.
+    lda #$45
+    sta oam ; Sprite 0 y-position.
+    sta oam + 3 ; Sprite 0 x-position.
+    lda #$01
+    sta oam + 1 ; Sprite tile.
+    sta oam + 2 ; Sprte palette. 
 main:
     jmp main
 
 nmi:
     inx
     stx $00
+    stx oam + 3
+
+    ; Sprite OAM DMA.
+    lda #0
+    sta PPU_OAM_ADDR
+    lda #>oam
+    sta PPU_OAM_DMA
 
     ; Set scroll.
     stx PPU_SCROLL_ADDR ; x-scroll
@@ -113,6 +143,7 @@ nmi:
 irq:
     rti
 
+.ORG $0200
 oam:
     .res 256 ; Dedicated space for sprites.
 
