@@ -27,7 +27,7 @@ COLOR_BLACK = $0F
 COLOR_BLUE = $22
 COLOR_PINK = $25
 
-.segment "HEADER"
+.segment "INESHDR"
 .byte "NES", $1A ; iNES Header
 .byte SIZE_PRG_ROM_IN_16KB
 .byte SIZE_CHR_ROM_IN_8KB
@@ -35,7 +35,17 @@ COLOR_PINK = $25
 .byte MAPPER_HI
 .byte "PUCHIE_D"
 
-.segment "STARTUP"
+.ZEROPAGE
+tick: .res 1
+
+.segment "OAM"
+oam:
+    .res 256 ; Dedicated space for sprites.
+
+.BSS
+sprite1XPos: .res 1
+
+.CODE
 reset:
     sei ; Disable interrupts.
     cld ; Disable decimal mode.
@@ -111,7 +121,7 @@ reset:
     lda #$15 ; Sprite palette 1.
     sta PPU_ADDR_ADDR
 
-    lda #COLOR_BLUE
+    lda sprite1Color
     STA PPU_DATA_ADDR
 
     ; Draw sprite 0.
@@ -122,12 +132,14 @@ reset:
     sta oam + 1 ; Sprite tile.
     sta oam + 2 ; Sprte palette. 
 main:
+    inc tick
     jmp main
 
 nmi:
-    inx
-    stx $00
+    ldx sprite1XPos
     stx oam + 3
+    inx
+    stx sprite1XPos
 
     ; Sprite OAM DMA.
     lda #0
@@ -143,14 +155,14 @@ nmi:
 irq:
     rti
 
-.ORG $0200
-oam:
-    .res 256 ; Dedicated space for sprites.
+.RODATA
+sprite1Color:
+.byte COLOR_BLUE
 
 .segment "VECTORS"
 .word nmi
 .word reset
 .word irq
 
-.segment "CHARS"
+.segment "CHR"
 .incbin "frontOffice.chr"
