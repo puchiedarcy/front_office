@@ -27,7 +27,7 @@ COLOR_BLACK = $0F
 COLOR_BLUE = $22
 COLOR_PINK = $25
 
-.segment "INESHDR"
+.segment "HEADER"
 .byte "NES", $1A ; iNES Header
 .byte SIZE_PRG_ROM_IN_16KB
 .byte SIZE_CHR_ROM_IN_8KB
