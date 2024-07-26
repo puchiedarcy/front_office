@@ -4,6 +4,6 @@ all:
 	./labelMaker.sh frontOffice.labels
 
 clean:
-	rm frontOffice.labels
-	rm frontOffice.nes*
-	rm frontOffice.o
+	rm -f frontOffice.labels
+	rm -f frontOffice.nes*
+	rm -f frontOffice.o
