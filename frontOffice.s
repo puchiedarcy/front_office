@@ -1,5 +1,4 @@
-NUM_PRG_ROM_IN_16KB = 2 ; Number of 16KB PRG sections
-NUM_CHR_ROM_IN_8KB = 1 ; Number of 8KB CHR sections
+.include "header.s"
 
 PPU_CONTROLLER_ADDR = $2000
 PPU_MASK_ADDR = $2001
@@ -22,13 +21,6 @@ APU_STATUS_ADDR = $4015
 APU_FRAME_COUNTER_ADDR = $4017
 
 COLOR_BLACK = $0F
-
-.segment "HEADER"
-.byte "NES", $1A ; iNES Header
-.byte NUM_PRG_ROM_IN_16KB
-.byte NUM_CHR_ROM_IN_8KB
-.byte "00" ; Mapper information
-.byte "00000000" ; iNES 2.0 information
 
 .ZEROPAGE
 
