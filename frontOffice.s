@@ -1,26 +1,9 @@
 .include "header.s"
-
-PPU_CONTROLLER_ADDR = $2000
-PPU_MASK_ADDR = $2001
-PPU_STATUS_ADDR = $2002
-PPU_OAM_ADDR = $2003
-PPU_SCROLL_ADDR = $2005
-PPU_ADDR_ADDR = $2006
-PPU_DATA_ADDR = $2007
-PPU_OAM_DMA = $4014
-
-PPU_CONTROLLER_ENABLE_NMI = %10000000
-
-PPU_MASK_RENDER_SPRITES = %00010000
-PPU_MASK_RENDER_BACKGROUND = %00001000
-
-PPU_PALETTE_ADDR_HI = $3F
+.include "ppu.s"
 
 APU_DMC_FLAGS_AND_RATE_ADDR = $4010
 APU_STATUS_ADDR = $4015
 APU_FRAME_COUNTER_ADDR = $4017
-
-COLOR_BLACK = $0F
 
 .ZEROPAGE
 
@@ -62,8 +45,8 @@ reset:
         sta $0700, x
         bne :- ; Branch while X!=0
 
-    ; Place all sprites offscreen at Y=255
-    lda #255
+    ; Place all sprites off-screen at Y=255
+    lda #255 ; Off-screen and empty tile value.
     ldx #0
     :
         sta oam, x ; Byte 0 (Y-coordinate)
@@ -76,19 +59,11 @@ reset:
 
     ; Wait for at least 2 VBlanks as PPU initializes
     bit PPU_STATUS_ADDR ; Handle VBlank flag not cleared on reset
-    :
-        bit PPU_STATUS_ADDR
-        bpl :-
-    :
-        bit PPU_STATUS_ADDR
-        bpl :-
+    wait_for_vblank
+    wait_for_vblank
 
     ; Clear background with empty tile FF
-    lda #$20
-    sta PPU_ADDR_ADDR
-    lda #$00
-    sta PPU_ADDR_ADDR
-
+    set_ppu_addr #(PPU_ADDR_NAMETABLE_HI), #0
     lda #$FF
     ldy #4
     :
@@ -101,18 +76,16 @@ reset:
         bne :--
 
     ; Set universal background color
-    lda #PPU_PALETTE_ADDR_HI
+    lda #PPU_ADDR_PALETTE_HI
     sta PPU_ADDR_ADDR
-    lda #$00
+    lda #PPU_ADDR_PALETTE_UNIVERSAL_BG
     sta PPU_ADDR_ADDR
-
-    lda #COLOR_BLACK
+    lda #PPU_COLOR_BLACK
     sta PPU_DATA_ADDR
 
     ; Turn on rendering
     lda #(PPU_MASK_RENDER_BACKGROUND)
     sta PPU_MASK_ADDR
-
     lda #(PPU_CONTROLLER_ENABLE_NMI)
     sta PPU_CONTROLLER_ADDR
 
@@ -126,7 +99,7 @@ nmi:
     lda #>oam
     sta PPU_OAM_DMA
 
-    ; Clean PPU write flag before setting scroll
+    ; Clear PPU write flag before setting scroll
     bit PPU_STATUS_ADDR
     lda #0
     sta PPU_SCROLL_ADDR ; Set X scroll
