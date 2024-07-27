@@ -19,6 +19,23 @@ PPU_OAM_DMA = $4014
 
 PPU_COLOR_BLACK = $0F
 
+.segment "OAM"
+oam:
+    .res 256 ; Dedicated space for sprites
+
+.macro move_all_sprites_off_screen
+lda #255 ; Off-screen and empty tile value.
+ldx #0
+:
+    sta oam, x ; Byte 0 (Y-coordinate)
+    inx
+    sta oam, x ; Byte 1 (tile number)
+    inx ; Skip byte 2 (attributes)
+    inx ; Skip byte 3 (X-coordinate)
+    inx ; Align to Byte 0 of next sprite
+    bne :- ; Branch while X!=0
+.endmacro
+
 .macro wait_for_vblank
     :
         bit PPU_STATUS_ADDR

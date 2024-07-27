@@ -7,10 +7,6 @@ APU_FRAME_COUNTER_ADDR = $4017
 
 .ZEROPAGE
 
-.segment "OAM"
-oam:
-    .res 256 ; Dedicated space for sprites
-
 .BSS
 
 .CODE
@@ -43,19 +39,10 @@ reset:
         sta $0500, x
         sta $0600, x
         sta $0700, x
+        inx
         bne :- ; Branch while X!=0
 
-    ; Place all sprites off-screen at Y=255
-    lda #255 ; Off-screen and empty tile value.
-    ldx #0
-    :
-        sta oam, x ; Byte 0 (Y-coordinate)
-        inx
-        sta oam, x ; Byte 1 (tile number)
-        inx ; Skip byte 2 (attributes)
-        inx ; Skip byte 3 (X-coordinate)
-        inx ; Align to Byte 0 of next sprite
-        bne :- ; Branch while X!=0
+    move_all_sprites_off_screen
 
     ; Wait for at least 2 VBlanks as PPU initializes
     bit PPU_STATUS_ADDR ; Handle VBlank flag not cleared on reset
@@ -76,10 +63,7 @@ reset:
         bne :--
 
     ; Set universal background color
-    lda #PPU_ADDR_PALETTE_HI
-    sta PPU_ADDR_ADDR
-    lda #PPU_ADDR_PALETTE_UNIVERSAL_BG
-    sta PPU_ADDR_ADDR
+    set_ppu_addr #PPU_ADDR_PALETTE_HI, #PPU_ADDR_PALETTE_UNIVERSAL_BG
     lda #PPU_COLOR_BLACK
     sta PPU_DATA_ADDR
 
