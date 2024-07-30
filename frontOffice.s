@@ -1,17 +1,7 @@
+.include "apu.s"
 .include "controller.s"
 .include "header.s"
 .include "ppu.s"
-
-APU_PULSE1_TONE = $4000
-APU_PULSE1_SWEEP = $4001
-APU_PULSE1_FREQUENCY_LO = $4002
-APU_PULSE1_FREQUENCY_HI = $4003
-
-APU_A440_LO = 253
-
-APU_DMC_FLAGS_AND_RATE_ADDR = $4010
-APU_STATUS_ADDR = $4015
-APU_FRAME_COUNTER_ADDR = $4017
 
 .ZEROPAGE
 
@@ -86,22 +76,8 @@ main:
 nmi:
     read_controller1
 
-    lda controller1
-    and #%10000000
-    beq skipAudio
+    on_press_goto BUTTON_A | BUTTON_B, play_beep
 
-    lda #0
-    sta APU_PULSE1_TONE
-    lda #0
-    sta APU_PULSE1_SWEEP
-    lda #APU_A440_LO
-    sta APU_PULSE1_FREQUENCY_LO
-    lda #0
-    sta APU_PULSE1_FREQUENCY_HI
-    lda #1
-    sta APU_STATUS_ADDR
-
-skipAudio:
     ; Sprite DMA
     lda #0
     sta PPU_OAM_ADDR
