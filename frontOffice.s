@@ -3,6 +3,13 @@
 
 JOY1_ADDR = $4016
 
+APU_PULSE1_TONE = $4000
+APU_PULSE1_SWEEP = $4001
+APU_PULSE1_FREQUENCY_LO = $4002
+APU_PULSE1_FREQUENCY_HI = $4003
+
+APU_A440_LO = 253
+
 APU_DMC_FLAGS_AND_RATE_ADDR = $4010
 APU_STATUS_ADDR = $4015
 APU_FRAME_COUNTER_ADDR = $4017
@@ -88,17 +95,34 @@ read_joy1:
     ; Strobe JOY1_ADDR to latch buttons pressed
     lda #1
     sta JOY1_ADDR
-    lda #0
-    sta JOY1_ADDR
-    sta joy1_this_frame ; Clear buttons pressed
-    
-    lda JOY1_ADDR ; A button status
-    and #%00000001 ; Clear garbage input
     sta joy1_this_frame
-    eor joy1_last_frame
+    lsr a
+    sta JOY1_ADDR
+    :
+        lda JOY1_ADDR
+        lsr a
+        rol joy1_this_frame
+        bcc :-
+    lda joy1_last_frame
+    eor #%11111111
     and joy1_this_frame
-    sta joy1
+    sta joy1 ; Only new button presses this frame
 
+    and #%10000000
+    beq skipAudio
+
+    lda #0
+    sta APU_PULSE1_TONE
+    lda #0
+    sta APU_PULSE1_SWEEP
+    lda #APU_A440_LO
+    sta APU_PULSE1_FREQUENCY_LO
+    lda #0
+    sta APU_PULSE1_FREQUENCY_HI
+    lda #1
+    sta APU_STATUS_ADDR
+
+skipAudio:
     ; Sprite DMA
     lda #0
     sta PPU_OAM_ADDR
