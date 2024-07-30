@@ -35,11 +35,10 @@ controller1_last_frame: .res 1
     sta controller1 ; Only new button presses this frame
 .endmacro
 
-.macro on_press_goto btn, label
+.macro on_press_goto btn, macro
     lda controller1
     and #btn
     beq :+
-
-    label
-:    
+        macro
+    :    
 .endmacro

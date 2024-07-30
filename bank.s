@@ -1,11 +1,15 @@
-MONEY = $235D
+MONEY = $235B
 
 .ZEROPAGE
 money: .res 1
 
 .macro print_money
     set_ppu_addr #>MONEY, #<MONEY
-    lda money
+    lda decimal
+    sta PPU_DATA_ADDR
+    lda decimal+1
+    sta PPU_DATA_ADDR
+    lda decimal+2
     sta PPU_DATA_ADDR
 .endmacro
 

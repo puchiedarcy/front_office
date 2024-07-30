@@ -1,9 +1,9 @@
 all:
-	ca65 -g -o frontOffice.o -t nes frontOffice.s
-	ld65 -C frontOffice.cfg -Ln frontOffice.labels -o frontOffice.nes frontOffice.o
-	./labelMaker.sh frontOffice.labels
+	ca65 -g -o front_office.o -t nes front_office.s
+	ld65 -C front_office.cfg -Ln front_office.labels -o front_office.nes front_office.o
+	./label_maker.sh front_office.labels
 
 clean:
-	rm -f frontOffice.labels
-	rm -f frontOffice.nes*
-	rm -f frontOffice.o
+	rm -f front_office.labels
+	rm -f front_office.nes*
+	rm -f front_office.o

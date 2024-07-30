@@ -1,6 +1,7 @@
 .include "apu.s"
 .include "bank.s"
 .include "controller.s"
+.include "double_dabble.s"
 .include "header.s"
 .include "ppu.s"
 
@@ -72,6 +73,16 @@ reset:
     sta PPU_CONTROLLER_ADDR
 
 main:
+    lda #0
+    sta PPU_CONTROLLER_ADDR
+
+    lda money
+    sta binary
+    double_dabble
+    
+    lda #(PPU_CONTROLLER_ENABLE_NMI)
+    sta PPU_CONTROLLER_ADDR
+
     jmp main
 
 nmi:
@@ -106,4 +117,4 @@ irq:
 .word irq
 
 .segment "CHR"
-.incbin "frontOffice.chr"
+.incbin "front_office.chr"
