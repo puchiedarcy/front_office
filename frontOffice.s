@@ -1,4 +1,5 @@
 .include "apu.s"
+.include "bank.s"
 .include "controller.s"
 .include "header.s"
 .include "ppu.s"
@@ -77,6 +78,9 @@ nmi:
     read_controller1
 
     on_press_goto BUTTON_A | BUTTON_B, play_beep
+    on_press_goto BUTTON_A, add_money
+
+    print_money
 
     ; Sprite DMA
     lda #0
