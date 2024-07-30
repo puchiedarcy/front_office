@@ -1,7 +1,6 @@
+.include "controller.s"
 .include "header.s"
 .include "ppu.s"
-
-JOY1_ADDR = $4016
 
 APU_PULSE1_TONE = $4000
 APU_PULSE1_SWEEP = $4001
@@ -15,9 +14,6 @@ APU_STATUS_ADDR = $4015
 APU_FRAME_COUNTER_ADDR = $4017
 
 .ZEROPAGE
-joy1: .res 1
-joy1_this_frame: .res 1
-joy1_last_frame: .res 1
 
 .BSS
 
@@ -88,26 +84,9 @@ main:
     jmp main
 
 nmi:
-read_joy1:
-    lda joy1_this_frame
-    sta joy1_last_frame
-    
-    ; Strobe JOY1_ADDR to latch buttons pressed
-    lda #1
-    sta JOY1_ADDR
-    sta joy1_this_frame
-    lsr a
-    sta JOY1_ADDR
-    :
-        lda JOY1_ADDR
-        lsr a
-        rol joy1_this_frame
-        bcc :-
-    lda joy1_last_frame
-    eor #%11111111
-    and joy1_this_frame
-    sta joy1 ; Only new button presses this frame
+    read_controller1
 
+    lda controller1
     and #%10000000
     beq skipAudio
 
