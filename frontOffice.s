@@ -1,11 +1,16 @@
 .include "header.s"
 .include "ppu.s"
 
+JOY1_ADDR = $4016
+
 APU_DMC_FLAGS_AND_RATE_ADDR = $4010
 APU_STATUS_ADDR = $4015
 APU_FRAME_COUNTER_ADDR = $4017
 
 .ZEROPAGE
+joy1: .res 1
+joy1_this_frame: .res 1
+joy1_last_frame: .res 1
 
 .BSS
 
@@ -25,7 +30,6 @@ reset:
     inx ; Sets X register to 0
     stx PPU_CONTROLLER_ADDR ; Disable NMI
     stx PPU_MASK_ADDR ; Disable rendering
-    stx APU_STATUS_ADDR ; Disable APU sound
     stx APU_DMC_FLAGS_AND_RATE_ADDR ; Disable DMC IRQ
 
     ; Clear all RAM to 0
@@ -77,6 +81,24 @@ main:
     jmp main
 
 nmi:
+read_joy1:
+    lda joy1_this_frame
+    sta joy1_last_frame
+    
+    ; Strobe JOY1_ADDR to latch buttons pressed
+    lda #1
+    sta JOY1_ADDR
+    lda #0
+    sta JOY1_ADDR
+    sta joy1_this_frame ; Clear buttons pressed
+    
+    lda JOY1_ADDR ; A button status
+    and #%00000001 ; Clear garbage input
+    sta joy1_this_frame
+    eor joy1_last_frame
+    and joy1_this_frame
+    sta joy1
+
     ; Sprite DMA
     lda #0
     sta PPU_OAM_ADDR
