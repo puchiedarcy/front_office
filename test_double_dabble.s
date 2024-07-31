@@ -12,7 +12,7 @@
 
 .CODE
 _main:
-    lda #254
+    lda #255
     sta binary
     
     double_dabble
