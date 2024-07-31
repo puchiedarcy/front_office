@@ -1,0 +1,14 @@
+name: Build and Test
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name : Install cc65
+      run: sudo apt-get install cc65
+    - name: make
+      run: make
