@@ -2,33 +2,31 @@
 decimal: .res 3
 binary: .res 1
 
+; Converts a binary number to its decimal form
 .macro double_dabble
+    ; Zero-out all decimal bytes
     lda #0
-    sta decimal+2
-    sta decimal+1
-    sta decimal
+    .repeat 3, i
+        sta decimal+i
+    .endrepeat
 
-.repeat 8
-    clc
-    rol binary
-    rol decimal+2
-    rol decimal+1
-    rol decimal
+    ; For each binary bit
+    .repeat 8
+        clc
+        rol binary
+        .repeat 3, i
+            rol decimal+2-i
+        .endrepeat
 
-    lda decimal+2
-    cmp #10
-    bcc :+
-        sbc #10
-        sta decimal+2
-        inc decimal+1
-    :
-
-    lda decimal+1
-    cmp #10
-    bcc :+
-        sbc #10
-        sta decimal+1
-        inc decimal
-    :
-.endrepeat
+        ; Process any carry values
+        .repeat 2, i
+            lda decimal+2-i
+            cmp #10
+            bcc :+
+                sbc #10
+                sta decimal+2-i
+                inc decimal+1-i
+                :
+        .endrepeat
+    .endrepeat
 .endmacro
