@@ -1,7 +1,7 @@
 .include "apu.s"
 .include "bank.s"
 .include "controller.s"
-.include "double_dabble.s"
+.include "double_dabble.inc"
 .include "header.s"
 .include "ppu.s"
 
@@ -77,9 +77,9 @@ main:
     sta PPU_CONTROLLER_ADDR
 
     lda money
-    sta binary
-    double_dabble
-    
+    sta dd_binary
+    jsr double_dabble
+
     lda #(PPU_CONTROLLER_ENABLE_NMI)
     sta PPU_CONTROLLER_ADDR
 
