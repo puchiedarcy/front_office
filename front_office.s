@@ -1,4 +1,4 @@
-.include "apu.s"
+.include "lib/apu/apu.inc"
 .include "lib/bank/bank.inc"
 .include "controller.s"
 .include "lib/double_dabble/double_dabble.inc"
