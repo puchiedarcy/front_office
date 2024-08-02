@@ -1,20 +1,12 @@
-CONTROLLER1_ADDR= $4016
-
-BUTTON_A = %10000000
-BUTTON_B = %01000000
-BUTTON_SELECT = %00100000
-BUTTON_START = %00010000
-BUTTON_UP = %00001000
-BUTTON_DOWN = %00000100
-BUTTON_LEFT = %00000010
-BUTTON_RIGHT = %00000001
+.include "controller.inc"
 
 .ZEROPAGE
 controller1: .res 1
 controller1_this_frame: .res 1
 controller1_last_frame: .res 1
 
-.macro read_controller1
+.CODE
+read_controller1:
     ; Move last frame's inputs
     lda controller1_this_frame
     sta controller1_last_frame
@@ -45,12 +37,4 @@ controller1_last_frame: .res 1
     eor #%11111111
     and controller1_this_frame
     sta controller1
-.endmacro
-
-.macro on_press_goto btn, macro
-    lda controller1
-    and #btn
-    beq :+
-        jsr macro
-    :    
-.endmacro
+    rts

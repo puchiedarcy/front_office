@@ -1,6 +1,6 @@
 .include "lib/apu/apu.inc"
 .include "lib/bank/bank.inc"
-.include "controller.s"
+.include "lib/controller/controller.inc"
 .include "lib/double_dabble/double_dabble.inc"
 .include "header.s"
 .include "ppu.s"
@@ -86,7 +86,7 @@ main:
     jmp main
 
 nmi:
-    read_controller1
+    jsr read_controller1
 
     on_press_goto BUTTON_A | BUTTON_B, play_beep
     on_press_goto BUTTON_A, add_money
