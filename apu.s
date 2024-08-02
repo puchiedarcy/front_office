@@ -9,7 +9,7 @@ APU_FRAME_COUNTER_ADDR = $4017
 
 APU_A440_LO = 253
 
-.macro play_beep
+play_beep:
     lda #0
     sta APU_PULSE1_TONE
     lda #0
@@ -20,4 +20,4 @@ APU_A440_LO = 253
     sta APU_PULSE1_FREQUENCY_HI
     lda #1
     sta APU_STATUS_ADDR
-.endmacro
+    rts
