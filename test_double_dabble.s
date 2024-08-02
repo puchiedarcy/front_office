@@ -1,5 +1,6 @@
+.include "double_dabble.inc"
+
 .export _main
-.include "double_dabble.s"
 
 .macro assert expected, actual, code
     lda expected
@@ -13,13 +14,13 @@
 .CODE
 _main:
     lda #255
-    sta binary
+    sta dd_binary
     
-    double_dabble
+    jsr double_dabble
 
-    assert decimal, #2, #1
-    assert decimal+1, #5, #2
-    assert decimal+2, #5, #3
+    assert dd_decimal, #2, #1
+    assert dd_decimal+1, #5, #2
+    assert dd_decimal+2, #5, #3
 
     lda #0
     rts
