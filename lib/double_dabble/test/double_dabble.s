@@ -1,4 +1,4 @@
-.include "double_dabble.inc"
+.include "../double_dabble.inc"
 
 .export _main
 

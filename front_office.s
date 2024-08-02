@@ -1,7 +1,7 @@
 .include "apu.s"
-.include "bank.s"
+.include "lib/bank/bank.inc"
 .include "controller.s"
-.include "double_dabble.inc"
+.include "lib/double_dabble/double_dabble.inc"
 .include "header.s"
 .include "ppu.s"
 
@@ -91,7 +91,14 @@ nmi:
     on_press_goto BUTTON_A | BUTTON_B, play_beep
     on_press_goto BUTTON_A, add_money
 
-    print_money
+    MONEY = $235B
+    set_ppu_addr #>MONEY, #<MONEY
+    lda dd_decimal
+    sta PPU_DATA_ADDR
+    lda dd_decimal+1
+    sta PPU_DATA_ADDR
+    lda dd_decimal+2
+    sta PPU_DATA_ADDR
 
     ; Sprite DMA
     lda #0

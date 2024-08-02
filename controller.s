@@ -51,6 +51,6 @@ controller1_last_frame: .res 1
     lda controller1
     and #btn
     beq :+
-        macro
+        jsr macro
     :    
 .endmacro

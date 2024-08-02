@@ -1,20 +1,27 @@
-all: libs test build
+all: build
 
-libs:
-	cl65 -c double_dabble.s
-	ar65 r double_dabble.lib double_dabble.o
-
-test: libs
-	cl65 -o test_double_dabble.prg -t sim6502 test_double_dabble.s double_dabble.lib
-	sim65 -c test_double_dabble.prg
-
-build: libs 
-	cl65 -C front_office.cfg -g -Ln front_office.labels -o front_office.nes -t nes front_office.s double_dabble.lib
-	./label_maker.sh front_office.labels
+build: libs test
 
 clean:
-	rm -f front_office.labels
-	rm -f front_office.nes*
-	rm -f *.lib
-	rm -f *.o
-	rm -f *.prg
+	rm -rf bin/
+
+libs: $(wildcard lib/*/*.s)
+	mkdir -p bin
+	$(foreach file, $^, \
+		ca65 -g -o bin/$(notdir $(basename $(file))).o $(file); \
+		ar65 r bin/$(notdir $(basename $(file))).lib bin/$(notdir $(basename $(file))).o; \
+	)
+
+test: libs test_inner
+
+test_inner: $(wildcard lib/*/test/*.s)
+	$(foreach file, $^, \
+		ca65 -g -t sim6502 -o bin/test_$(notdir $(basename $(file))).o $(file); \
+		ld65 -t sim6502 -o bin/test_$(notdir $(basename $(file))).prg bin/test_$(notdir $(basename $(file))).o bin/$(notdir $(basename $(file))).lib sim6502.lib; \
+		sim65 -c bin/test_$(notdir $(basename $(file))).prg; \
+	)
+
+release: build
+	ca65 -g -o bin/front_office.o -t nes front_office.s
+	ld65 -C front_office.cfg -Ln bin/front_office.labels -o bin/front_office.nes bin/*.o
+	./label_maker.sh bin/front_office.labels
