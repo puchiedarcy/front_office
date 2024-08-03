@@ -3,6 +3,7 @@
 .include "lib/controller/controller.inc"
 .include "lib/double_dabble/double_dabble.inc"
 .include "header.s"
+.include "lib/init/init.inc"
 .include "ppu.s"
 
 .ZEROPAGE
@@ -11,7 +12,7 @@
 
 .CODE
 reset:
-    sei ; Disable interrupts
+    disable_interrupt_requests
     cld ; Disable decimal mode
 
     ; Disable API IRQ

@@ -1,4 +1,5 @@
 .include "apu.inc"
+
 play_beep:
     lda #0
     sta APU_PULSE1_TONE
