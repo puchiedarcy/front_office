@@ -1,6 +1,8 @@
-.macro assert expected, actual, error_code
-    lda expected
-    cmp actual
+.macro assert actual, expected, error_code
+    .ifnblank actual
+        lda actual
+    .endif
+    cmp expected
     beq :+
         lda error_code
         rts
