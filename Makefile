@@ -1,11 +1,11 @@
 all: build
 
-build: libs test
+build: libs test_inner
 
 clean:
 	rm -rf bin/
 
-libs: $(wildcard lib/*/*.s)
+libs: $(wildcard lib/*/*.s test/test.s)
 	mkdir -p bin
 	$(foreach file, $^, \
 		ca65 -g -o bin/$(notdir $(basename $(file))).o $(file); \
@@ -14,12 +14,12 @@ libs: $(wildcard lib/*/*.s)
 
 test: libs test_inner
 
-test_inner: $(wildcard lib/*/test/*.s)
+test_inner: $(wildcard test/tests/*.s)
 	mkdir -p bin/test
 	$(foreach file, $^, \
-		ca65 -g -t sim6502 -o bin/test/test_$(notdir $(basename $(file))).o $(file); \
-		ld65 -t sim6502 -o bin/test/test_$(notdir $(basename $(file))).prg bin/test/test_$(notdir $(basename $(file))).o bin/$(notdir $(basename $(file))).lib sim6502.lib; \
-		sim65 -c -v bin/test/test_$(notdir $(basename $(file))).prg; \
+		ca65 -g -t sim6502 -o bin/test/$(notdir $(basename $(file))).o $(file); \
+		ld65 -t sim6502 -o bin/test/$(notdir $(basename $(file))).prg bin/test/$(notdir $(basename $(file))).o bin/$(notdir $(basename $(file))).lib sim6502.lib bin/test.lib; \
+		sim65 -c -v bin/test/$(notdir $(basename $(file))).prg; \
 	)
 
 release: build
