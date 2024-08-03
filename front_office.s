@@ -6,14 +6,10 @@
 .include "lib/init/init.inc"
 .include "ppu.s"
 
-.ZEROPAGE
-
-.BSS
-
 .CODE
 reset:
     disable_interrupt_requests
-    cld ; Disable decimal mode
+    disable_decimal_mode
 
     ; Disable API IRQ
     ldx #%01000000
@@ -116,8 +112,6 @@ nmi:
     rti
 irq:
     rti
-
-.RODATA
 
 .segment "VECTORS"
 .word nmi
