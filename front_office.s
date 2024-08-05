@@ -15,9 +15,7 @@ reset:
     ldx #%01000000
     stx APU_FRAME_COUNTER_ADDR
 
-    ; Initialize stack
-    ldx #$FF
-    txs
+    initialize_stack
 
     inx ; Sets X register to 0
     stx PPU_CONTROLLER_ADDR ; Disable NMI
