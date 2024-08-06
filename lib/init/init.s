@@ -1,14 +1,17 @@
 .include "init.inc"
 
 .CODE
+.export disable_interrupt_requests
 disable_interrupt_requests:
     sei
     rts
 
+.export disable_decimal_mode
 disable_decimal_mode:
     cld
     rts
 
+.export clear_ram
 clear_ram:
     lda #0
     txa
