@@ -3,38 +3,30 @@
 .include "lib/controller/controller.inc"
 .include "lib/double_dabble/double_dabble.inc"
 .include "header.s"
-.include "lib/init/init.inc"
 .include "ppu.s"
+
+.import disable_interrupt_requests
+.import disable_decimal_mode
+.import clear_ram
 
 .CODE
 reset:
-    disable_interrupt_requests
-    disable_decimal_mode
+    ; Initialize stack
+    ldx #$FF
+    txs
+
+    jsr disable_interrupt_requests
+    jsr disable_decimal_mode
+    jsr clear_ram
 
     ; Disable API IRQ
     ldx #%01000000
     stx APU_FRAME_COUNTER_ADDR
 
-    initialize_stack
-
     inx ; Sets X register to 0
     stx PPU_CONTROLLER_ADDR ; Disable NMI
     stx PPU_MASK_ADDR ; Disable rendering
     stx APU_DMC_FLAGS_AND_RATE_ADDR ; Disable DMC IRQ
-
-    ; Clear all RAM to 0
-    txa
-    : ; X=0, Loop until X overflows back to 0
-        sta $0000, x
-        sta $0100, x
-        sta $0200, x
-        sta $0300, x
-        sta $0400, x
-        sta $0500, x
-        sta $0600, x
-        sta $0700, x
-        inx
-        bne :- ; Branch while X!=0
 
     move_all_sprites_off_screen
 

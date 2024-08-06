@@ -1,12 +1,15 @@
 .include "../test.inc"
-.include "../../lib/init/init.inc"
+.import disable_interrupt_requests
+.import disable_decimal_mode
+.import clear_ram
+
 
 .CODE
 .export _main
 _main:
     jsr test_disable_interrupt_requests
     jsr test_disable_decimal_mode
-    jsr test_initialize_stack
+    jsr clear_ram
     rts
 
 test_disable_interrupt_requests:
@@ -14,7 +17,7 @@ test_disable_interrupt_requests:
     pha
     plp
 
-    disable_interrupt_requests
+    jsr disable_interrupt_requests
 
     php
     pla
@@ -28,7 +31,7 @@ test_disable_decimal_mode:
     pha
     plp
 
-    disable_decimal_mode
+    jsr disable_decimal_mode
 
     php
     pla
@@ -37,18 +40,11 @@ test_disable_decimal_mode:
     assert , #0, #2
     rts
 
-test_initialize_stack:
-    tsx
-    stx $00
-    assert_not $00, #$FF, #3
+test_clear_ram:
+    lda #45
+    sta $0444
 
-    initialize_stack
+    jsr clear_ram
 
-    lda $00
-    tsx
-    stx $00
-    tax
-    txs
-
-    assert $00, #$FF, #4
+    assert $0444, #0, #5
     rts
