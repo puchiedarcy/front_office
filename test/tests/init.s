@@ -1,8 +1,9 @@
 .include "../test.inc"
+
+.include "../../lib/init/init.inc"
 .import disable_interrupt_requests
 .import disable_decimal_mode
 .import clear_ram
-
 
 .CODE
 .export _main

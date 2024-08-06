@@ -8,5 +8,3 @@ APU_STATUS_ADDR = $4015
 APU_FRAME_COUNTER_ADDR = $4017
 
 APU_A440_LO = 253
-
-.global play_beep

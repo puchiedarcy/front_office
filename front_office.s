@@ -1,13 +1,17 @@
 .include "lib/apu/apu.inc"
+.import play_beep
+
 .include "lib/bank/bank.inc"
 .include "lib/controller/controller.inc"
 .include "lib/double_dabble/double_dabble.inc"
-.include "header.s"
-.include "ppu.s"
 
+.include "lib/init/init.inc"
 .import disable_interrupt_requests
 .import disable_decimal_mode
 .import clear_ram
+
+.include "header.s"
+.include "ppu.s"
 
 .CODE
 reset:
