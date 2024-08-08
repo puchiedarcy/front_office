@@ -11,5 +11,4 @@ _main:
     assert dd_decimal, #2, #1
     assert dd_decimal+1, #5, #2
     assert dd_decimal+2, #5, #3
-
     rts

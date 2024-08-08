@@ -14,7 +14,7 @@ disable_decimal_mode:
 .export clear_ram
 clear_ram:
     lda #0
-    txa
+    tax
     :
         sta $0000, x
         ; Skip $0100s (stack)

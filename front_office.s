@@ -3,12 +3,20 @@
 
 .include "lib/bank/bank.inc"
 .include "lib/controller/controller.inc"
+.importzp controller1
+.import read_controller1
+.import on_press_goto
+
 .include "lib/double_dabble/double_dabble.inc"
 
 .include "lib/init/init.inc"
 .import disable_interrupt_requests
 .import disable_decimal_mode
 .import clear_ram
+
+.include "lib/parameters/parameters.inc"
+.importzp p1
+.importzp a1
 
 .include "header.s"
 .include "ppu.s"
@@ -79,8 +87,21 @@ main:
 nmi:
     jsr read_controller1
 
-    on_press_goto BUTTON_A | BUTTON_B, play_beep
-    on_press_goto BUTTON_A, add_money
+    lda #(BUTTON_A | BUTTON_B)
+    sta p1
+    lda #<play_beep
+    sta a1
+    lda #>play_beep
+    sta a1+1
+    jsr on_press_goto
+
+    lda #BUTTON_A
+    sta p1
+    lda #<add_money
+    sta a1
+    lda #>add_money
+    sta a1+1
+    jsr on_press_goto
 
     MONEY = $235B
     set_ppu_addr #>MONEY, #<MONEY

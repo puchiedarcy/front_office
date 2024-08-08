@@ -12,5 +12,4 @@ _main:
     jsr play_beep
 
     assert APU_STATUS_ADDR, #1, #1
-
     rts

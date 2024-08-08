@@ -1,11 +1,20 @@
 .include "controller.inc"
 
+.importzp p1
+.importzp a1
+
 .ZEROPAGE
+.exportzp controller1
 controller1: .res 1
+
+.BSS
+.export controller1_this_frame
 controller1_this_frame: .res 1
+.export controller1_last_frame
 controller1_last_frame: .res 1
 
 .CODE
+.export read_controller1
 read_controller1:
     ; Move last frame's inputs
     lda controller1_this_frame
@@ -32,9 +41,19 @@ read_controller1:
         rol controller1_this_frame
         bcc :-
 
-    ; Calculate new button presses
+.export calculate_new_button_presses
+calculate_new_button_presses:
     lda controller1_last_frame
     eor #%11111111
     and controller1_this_frame
     sta controller1
+    rts
+
+.export on_press_goto
+on_press_goto:
+    lda p1
+    and controller1
+    beq :+
+        jmp (a1)
+    :
     rts

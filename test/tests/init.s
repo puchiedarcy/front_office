@@ -10,7 +10,7 @@
 _main:
     jsr test_disable_interrupt_requests
     jsr test_disable_decimal_mode
-    jsr clear_ram
+    jsr test_clear_ram
     rts
 
 test_disable_interrupt_requests:
