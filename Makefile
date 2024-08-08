@@ -18,7 +18,7 @@ test_inner: $(wildcard test/tests/*.s)
 	mkdir -p bin/test
 	$(foreach file, $^, \
 		ca65 -g -t sim6502 -o bin/test/$(notdir $(basename $(file))).o $(file); \
-		ld65 -t sim6502 -o bin/test/$(notdir $(basename $(file))).prg bin/test/$(notdir $(basename $(file))).o bin/$(notdir $(basename $(file))).lib sim6502.lib bin/test.lib bin/parameters.lib; \
+		ld65 -C sim6502_with_oam.cfg -o bin/test/$(notdir $(basename $(file))).prg bin/test/$(notdir $(basename $(file))).o bin/$(notdir $(basename $(file))).lib sim6502.lib bin/test.lib bin/parameters.lib; \
 		sim65 -c -v bin/test/$(notdir $(basename $(file))).prg; \
 	)
 
