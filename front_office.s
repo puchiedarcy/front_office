@@ -18,8 +18,13 @@
 .importzp p1
 .importzp a1
 
+.include "lib/ppu/ppu.inc"
+.import oam
+.import move_all_sprites_off_screen
+.import wait_for_vblank
+.import set_ppu_addr
+
 .include "header.s"
-.include "ppu.s"
 
 .CODE
 reset:
@@ -40,15 +45,19 @@ reset:
     stx PPU_MASK_ADDR ; Disable rendering
     stx APU_DMC_FLAGS_AND_RATE_ADDR ; Disable DMC IRQ
 
-    move_all_sprites_off_screen
+    jsr move_all_sprites_off_screen
 
     ; Wait for at least 2 VBlanks as PPU initializes
     bit PPU_STATUS_ADDR ; Handle VBlank flag not cleared on reset
-    wait_for_vblank
-    wait_for_vblank
+    jsr wait_for_vblank
+    jsr wait_for_vblank
 
     ; Clear background with empty tile FF
-    set_ppu_addr #(PPU_ADDR_NAMETABLE_HI), #0
+    lda #1
+    sta a1
+    lda #(PPU_ADDR_NAMETABLE_HI)
+    sta a1+1
+    jsr set_ppu_addr
     lda #$FF
     ldy #4
     :
@@ -61,7 +70,11 @@ reset:
         bne :--
 
     ; Set universal background color
-    set_ppu_addr #PPU_ADDR_PALETTE_HI, #PPU_ADDR_PALETTE_UNIVERSAL_BG
+    lda #PPU_ADDR_PALETTE_UNIVERSAL_BG
+    sta a1
+    lda #PPU_ADDR_PALETTE_HI
+    sta a1+1
+    jsr set_ppu_addr
     lda #PPU_COLOR_BLACK
     sta PPU_DATA_ADDR
 
@@ -104,7 +117,12 @@ nmi:
     jsr on_press_goto
 
     MONEY = $235B
-    set_ppu_addr #>MONEY, #<MONEY
+    lda #<MONEY
+    sta a1
+    lda #>MONEY
+    sta a1+1
+    jsr set_ppu_addr
+
     lda dd_decimal
     sta PPU_DATA_ADDR
     lda dd_decimal+1
