@@ -31,7 +31,7 @@ wait_for_vblank:
 
 .export set_ppu_addr
 set_ppu_addr:
-    lda PPU_STATUS_ADDR
+    bit PPU_STATUS_ADDR
 
     lda a1+1
     sta PPU_ADDR_ADDR
