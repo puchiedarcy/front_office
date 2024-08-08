@@ -1,7 +1,10 @@
 .include "lib/apu/apu.inc"
 .import play_beep
 
-.include "lib/bank/bank.inc"
+.include "lib/money/money.inc"
+.importzp money_total
+.import add_money
+
 .include "lib/controller/controller.inc"
 .importzp controller1
 .import read_controller1
@@ -88,7 +91,7 @@ main:
     lda #0
     sta PPU_CONTROLLER_ADDR
 
-    lda money
+    lda money_total
     sta dd_binary
     jsr double_dabble
 
@@ -116,10 +119,9 @@ nmi:
     sta a1+1
     jsr on_press_goto
 
-    MONEY = $235B
-    lda #<MONEY
+    lda #<MONEY_TOTAL_END_PPU_ADDR-2
     sta a1
-    lda #>MONEY
+    lda #>MONEY_TOTAL_END_PPU_ADDR
     sta a1+1
     jsr set_ppu_addr
 
