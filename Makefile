@@ -25,3 +25,4 @@ release: build
 	ca65 -g -o bin/front_office.o front_office.s
 	ld65 -C front_office.cfg -Ln bin/front_office.labels -m bin/front_office.map -o bin/front_office.nes bin/*.o
 	./label_maker.sh bin/front_office.labels
+	./map_maker.sh bin/front_office.map front_office.cfg bin/space_usage.json
