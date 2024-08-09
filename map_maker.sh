@@ -38,3 +38,29 @@ do
     echo $i
     echo "${segments[$i]}"
 done
+
+declare -A max_segment_sizes
+
+while IFS= read -r line; do
+    if [[ ${line} =~ ^[[:space:]]+([A-Z]+):.*size=\$([0-9A-F]+).* ]]; then
+        max_segment_sizes["${BASH_REMATCH[1]}"]="${BASH_REMATCH[2]}"
+    fi
+done < "$2"
+
+_COUNTER=0
+_NUM_SEGMENTS=${#max_segment_sizes[@]}
+(( _NUM_SEGMENTS-- ))
+echo "NUM SEG = $_NUM_SEGMENTS"
+echo "{"
+for i in "${!max_segment_sizes[@]}"
+do
+    echo "\"$i\": {"
+    echo "\"size\":\"${max_segment_sizes[$i]}\","
+    echo "\"used\":\"${segments[$i]:2:4}\""
+    echo "}"
+    if [[ $_COUNTER < $_NUM_SEGMENTS ]]; then
+        echo ","
+        (( _COUNTER++ ))
+    fi
+done
+echo "}"
