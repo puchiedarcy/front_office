@@ -1,3 +1,5 @@
+.include "header.inc"
+
 .segment "HEADER"
 .byte "NES", $1A ; iNES Header
 .byte 2 ; Number of 16KB PRG sections

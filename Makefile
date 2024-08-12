@@ -1,28 +1,57 @@
-all: build
+NAME := front_office.nes
 
-build: libs test_inner
+SRC_DIR := src
+SRCS := \
+		apu.s \
+		controller.s \
+		double_dabble.s \
+		header.s \
+		init.s \
+		main.s \
+		money.s \
+		parameters.s \
+		ppu.s
+SRCS := $(SRCS:%=$(SRC_DIR)/%)
+
+OBJ_DIR := obj
+OBJS := $(SRCS:$(SRC_DIR)/%.s=$(OBJ_DIR)/%.o)
+
+BIN_DIR := bin
+MKDIR_BIN := mkdir -o $(BIN_DIR)
+NES_FILE := $(BIN_DIR)/$(NAME).nes
+
+CA := ca65
+CFLAGS := -g #-I $(LIB_DIR)
+
+LD := ld65
+LFLAGS := -C front_office.cfg -Ln front_office.labels -m front_office.map
+
+RM := rm -rf
+MAKEFLAGS += --no-print-directory
+DIR_UP = mkdir -p $(@D)
+
+FCEUX := /mnt/c/Users/zplay/Apps/FCEUX/fceux64.exe
+
+all: $(NAME)
+
+$(NAME): $(OBJS)
+	mkdir -p $(BIN_DIR)
+	$(LD) $(LFLAGS) -o $(NES_FILE) $(OBJS)
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.s
+	$(DIR_UP)
+	$(CA) $(CFLAGS) -o $@ $<
 
 clean:
-	rm -rf bin/
+	$(RM) $(OBJ_DIR)
+	$(RM) $(BIN_DIR)
 
-libs: $(wildcard lib/*/*.s test/test.s)
-	mkdir -p bin
-	$(foreach file, $^, \
-		ca65 -g -o bin/$(notdir $(basename $(file))).o $(file); \
-	)
+re:
+	$(MAKE) clean
+	$(MAKE) all
 
-test: libs test_inner
+run: re
+	-$(FCEUX) $(NES_FILE)
 
-test_inner: $(wildcard test/tests/*.s)
-	mkdir -p bin/test
-	$(foreach file, $^, \
-		ca65 -g -t sim6502 -o bin/test/$(notdir $(basename $(file))).o $(file); \
-		ld65 -C sim6502_with_oam.cfg -o bin/test/$(notdir $(basename $(file))).prg bin/test/$(notdir $(basename $(file))).o bin/$(notdir $(basename $(file))).o sim6502.lib bin/test.o bin/parameters.o; \
-		sim65 -c -v bin/test/$(notdir $(basename $(file))).prg; \
-	)
-
-release: build
-	ca65 -g -o bin/front_office.o front_office.s
-	ld65 -C front_office.cfg -Ln bin/front_office.labels -m bin/front_office.map -o bin/front_office.nes bin/*.o
-	./label_maker.sh bin/front_office.labels
-	./map_maker.sh bin/front_office.map front_office.cfg bin/space_usage.json
+.PHONY: clean re run
+.SILENT:
