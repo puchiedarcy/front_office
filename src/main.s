@@ -1,33 +1,33 @@
-.include "lib/apu/apu.inc"
+.include "apu.inc"
 .import play_beep
 
-.include "lib/money/money.inc"
+.include "money.inc"
 .importzp money_total
 .import add_money
 
-.include "lib/controller/controller.inc"
+.include "controller.inc"
 .importzp controller1
 .import read_controller1
 .import on_press_goto
 
-.include "lib/double_dabble/double_dabble.inc"
+.include "double_dabble.inc"
 
-.include "lib/init/init.inc"
+.include "header.inc"
+
+.include "init.inc"
 .import disable_interrupt_requests
 .import disable_decimal_mode
 .import clear_ram
 
-.include "lib/parameters/parameters.inc"
+.include "parameters.inc"
 .importzp p1
 .importzp a1
 
-.include "lib/ppu/ppu.inc"
+.include "ppu.inc"
 .import oam
 .import move_all_sprites_off_screen
 .import wait_for_vblank
 .import set_ppu_addr
-
-.include "header.s"
 
 .CODE
 reset:
