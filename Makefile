@@ -23,9 +23,7 @@ DEPS := $(SRCS:$(SRC_DIR)/%.s=$(OBJ_DIR)/%.d)
 
 TEST_OBJS := $(SRCS:$(SRC_DIR)/%.s=$(OBJ_DIR)/test_%.o)
 TEST_PRGS := $(SRCS:$(SRC_DIR)/%.s=$(BIN_DIR)/test_%.prg)
-TEST_PRGS := $(filter-out $(BIN_DIR)/test_main.prg, $(TEST_PRGS))
-TEST_PRGS := $(filter-out $(BIN_DIR)/test_parameters.prg, $(TEST_PRGS))
-TEST_PRGS := $(filter-out $(BIN_DIR)/test_header.prg, $(TEST_PRGS))
+TEST_PRGS := $(filter-out %header.prg %main.prg %parameters.prg, $(TEST_PRGS))
 
 MKDIR_BIN := mkdir -o $(BIN_DIR)
 NES_FILE := $(BIN_DIR)/$(NAME).nes
@@ -51,6 +49,9 @@ DIR_UP = $(MKDIR) $(@D)
 
 FCEUX := /mnt/c/Users/zplay/Apps/FCEUX/fceux64.exe
 
+SIM := sim65
+SIM_FLAGS := # -c -v
+
 all: $(NAME)
 
 $(NAME): $(OBJS)
@@ -69,7 +70,7 @@ $(BIN_DIR)/test_main.prg:
 $(BIN_DIR)/test_%.prg: $(OBJ_DIR)/test_%.o $(OBJ_DIR)/%.o $(OBJ_DIR)/parameters.o
 	$(MKDIR) $(BIN_DIR)
 	$(LD) $(LFLAGS_TEST) -o $@ $^
-	sim65 -c -v $@
+	$(SIM) $(SIM_FLAGS) $@
 
 $(OBJ_DIR)/test_%.o: $(TEST_DIR)/%.s
 	$(DIR_UP)
@@ -81,6 +82,7 @@ clean:
 
 re:
 	$(MAKE) clean
+	$(MAKE) test
 	$(MAKE) all
 
 run: re
