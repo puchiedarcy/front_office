@@ -24,7 +24,14 @@ OBJ_DIR := obj
 OBJS := $(SRCS:$(SRC_DIR)/%.s=$(OBJ_DIR)/%.o)
 
 CFG_DIR := cfg
+CFG := $(CFG_DIR)/$(NAME).cfg
+
 UTIL_DIR := util
+LABEL_MAKER := $(UTIL_DIR)/label_maker.sh
+LABELS := $(BIN_DIR)/$(NAME).labels
+MAP_MAKER := $(UTIL_DIR)/map_maker.sh
+MAP := $(BIN_DIR)/$(NAME).map
+SPACE_USED := $(BIN_DIR)/$(NAME)_space_used.json
 
 MKDIR := mkdir -p
 RM := rm -rf
@@ -34,7 +41,7 @@ CA := ca65
 CFLAGS := -g -I $(SRC_DIR) -o
 
 LD := ld65
-LFLAGS := -C $(CFG_DIR)/front_office.cfg -Ln $(BIN_DIR)/front_office.labels -m $(BIN_DIR)/front_office.map -o
+LFLAGS := -C $(CFG) -Ln $(LABELS) -m $(MAP) -o
 LFLAGS_TEST := -C $(CFG_DIR)/sim6502.cfg sim6502.lib -o
 
 SIM := sim65
@@ -48,6 +55,8 @@ all: $(NES_FILE)
 $(NES_FILE): $(OBJS)
 	$(DIR_UP)
 	$(LD) $(LFLAGS) $(NES_FILE) $(OBJS)
+	$(LABEL_MAKER) $(LABELS) $(BIN_DIR)
+	$(MAP_MAKER) $(MAP) $(CFG) $(SPACE_USED)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.s
 	$(DIR_UP)
@@ -78,6 +87,8 @@ re:
 run: re
 	-$(FCEUX) $(NES_FILE)
 
+
+
 MAKEFLAGS += --no-print-directory
-.PHONY: clean re run
+.PHONY: all clean re run test
 .SILENT:
