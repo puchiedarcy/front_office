@@ -1,5 +1,5 @@
-.include "../test.inc"
-.include "../../lib/double_dabble/double_dabble.inc"
+.include "test.inc"
+.include "double_dabble.inc"
 
 .export _main
 _main:

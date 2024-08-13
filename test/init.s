@@ -1,6 +1,6 @@
-.include "../test.inc"
+.include "test.inc"
+.include "init.inc"
 
-.include "../../lib/init/init.inc"
 .import disable_interrupt_requests
 .import disable_decimal_mode
 .import clear_ram

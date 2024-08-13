@@ -1,6 +1,5 @@
-.include "../test.inc"
-
-.include "../../lib/money/money.inc"
+.include "test.inc"
+.include "money.inc"
 .importzp money_total
 .import add_money
 

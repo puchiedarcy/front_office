@@ -1,6 +1,5 @@
-.include "../test.inc"
-
-.include "../../lib/apu/apu.inc"
+.include "test.inc"
+.include "apu.inc"
 .import play_beep
 
 .CODE

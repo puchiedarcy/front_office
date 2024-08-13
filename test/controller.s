@@ -1,6 +1,5 @@
-.include "../test.inc"
-
-.include "../../lib/controller/controller.inc"
+.include "test.inc"
+.include "controller.inc"
 .importzp controller1
 .import controller1_this_frame
 .import controller1_last_frame
