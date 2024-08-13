@@ -1,4 +1,6 @@
-NAME := front_office.nes
+BIN_DIR := bin
+NAME := front_office
+NES_FILE := $(BIN_DIR)/$(NAME).nes
 
 SRC_DIR := src
 SRCS := \
@@ -13,68 +15,34 @@ SRCS := \
 		ppu.s
 SRCS := $(SRCS:%=$(SRC_DIR)/%)
 
-BIN_DIR := bin
-
 OBJ_DIR := obj
 OBJS := $(SRCS:$(SRC_DIR)/%.s=$(OBJ_DIR)/%.o)
-DEPS := $(SRCS:$(SRC_DIR)/%.s=$(OBJ_DIR)/%.d)
-
--include $(DEPS)
-
-TEST_OBJS := $(SRCS:$(SRC_DIR)/%.s=$(OBJ_DIR)/test_%.o)
-TEST_PRGS := $(SRCS:$(SRC_DIR)/%.s=$(BIN_DIR)/test_%.prg)
-TEST_PRGS := $(filter-out %header.prg %main.prg %parameters.prg, $(TEST_PRGS))
-
-MKDIR_BIN := mkdir -o $(BIN_DIR)
-NES_FILE := $(BIN_DIR)/$(NAME).nes
 
 CFG_DIR := cfg
-
 UTIL_DIR := util
-
 TEST_DIR := test
 
+MKDIR := mkdir -p
+RM := rm -rf
+DIR_UP = $(MKDIR) $(@D)
+
 CA := ca65
-CFLAGS = -g -I $(SRC_DIR) --create-dep $(subst .o,.d,$@)
-CFLAGS_TEST := -t sim6502
+CFLAGS := -g -I $(SRC_DIR)
 
 LD := ld65
 LFLAGS := -C $(CFG_DIR)/front_office.cfg -Ln $(BIN_DIR)/front_office.labels -m $(BIN_DIR)/front_office.map
-LFLAGS_TEST := -C $(CFG_DIR)/sim6502_with_oam.cfg sim6502.lib
-
-RM := rm -rf
-MAKEFLAGS += --no-print-directory
-MKDIR := mkdir -p
-DIR_UP = $(MKDIR) $(@D)
 
 FCEUX := /mnt/c/Users/zplay/Apps/FCEUX/fceux64.exe
 
-SIM := sim65
-SIM_FLAGS := # -c -v
+all: $(NES_FILE)
 
-all: $(NAME)
-
-$(NAME): $(OBJS)
-	$(MKDIR) $(BIN_DIR)
+$(NES_FILE): $(OBJS)
+	$(DIR_UP)
 	$(LD) $(LFLAGS) -o $(NES_FILE) $(OBJS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.s
 	$(DIR_UP)
 	$(CA) $(CFLAGS) -o $@ $^
-
-test: $(TEST_PRGS)
-	$(MKDIR) $(BIN_DIR)
-
-$(BIN_DIR)/test_main.prg:
-
-$(BIN_DIR)/test_%.prg: $(OBJ_DIR)/test_%.o $(OBJ_DIR)/%.o $(OBJ_DIR)/parameters.o
-	$(MKDIR) $(BIN_DIR)
-	$(LD) $(LFLAGS_TEST) -o $@ $^
-	$(SIM) $(SIM_FLAGS) $@
-
-$(OBJ_DIR)/test_%.o: $(TEST_DIR)/%.s
-	$(DIR_UP)
-	$(CA) $(CFLAGS) $(CFLAGS_TEST) -o $@ $^
 
 clean:
 	$(RM) $(OBJ_DIR)
@@ -82,11 +50,11 @@ clean:
 
 re:
 	$(MAKE) clean
-	$(MAKE) test
 	$(MAKE) all
 
 run: re
 	-$(FCEUX) $(NES_FILE)
 
+MAKEFLAGS += --no-print-directory
 .PHONY: clean re run
 .SILENT:
