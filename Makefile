@@ -20,22 +20,26 @@ BIN_DIR := bin
 MKDIR_BIN := mkdir -o $(BIN_DIR)
 NES_FILE := $(BIN_DIR)/$(NAME).nes
 
+CFG_DIR := cfg
+UTIL_DIR := util
+
 CA := ca65
 CFLAGS := -g #-I $(LIB_DIR)
 
 LD := ld65
-LFLAGS := -C front_office.cfg -Ln front_office.labels -m front_office.map
+LFLAGS := -C $(CFG_DIR)/front_office.cfg -Ln $(BIN_DIR)/front_office.labels -m $(BIN_DIR)/front_office.map
 
 RM := rm -rf
 MAKEFLAGS += --no-print-directory
-DIR_UP = mkdir -p $(@D)
+MKDIR := mkdir -p
+DIR_UP = $(MKDIR) $(@D)
 
 FCEUX := /mnt/c/Users/zplay/Apps/FCEUX/fceux64.exe
 
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	mkdir -p $(BIN_DIR)
+	$(MKDIR) $(BIN_DIR)
 	$(LD) $(LFLAGS) -o $(NES_FILE) $(OBJS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.s
