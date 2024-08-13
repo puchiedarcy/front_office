@@ -13,21 +13,29 @@ SRCS := \
 		ppu.s
 SRCS := $(SRCS:%=$(SRC_DIR)/%)
 
+BIN_DIR := bin
+
 OBJ_DIR := obj
 OBJS := $(SRCS:$(SRC_DIR)/%.s=$(OBJ_DIR)/%.o)
+TEST_OBJS := $(SRCS:$(SRC_DIR)/%.s=$(OBJ_DIR)/test_%.o)
+TEST_PRGS := $(SRCS:$(SRC_DIR)/%.s=$(BIN_DIR)/test_%.prg)
 
-BIN_DIR := bin
 MKDIR_BIN := mkdir -o $(BIN_DIR)
 NES_FILE := $(BIN_DIR)/$(NAME).nes
 
 CFG_DIR := cfg
+
 UTIL_DIR := util
 
+TEST_DIR := test
+
 CA := ca65
-CFLAGS := -g #-I $(LIB_DIR)
+CFLAGS := -g -I $(SRC_DIR)
+CFLAGS_TEST := -t sim6502
 
 LD := ld65
 LFLAGS := -C $(CFG_DIR)/front_office.cfg -Ln $(BIN_DIR)/front_office.labels -m $(BIN_DIR)/front_office.map
+LFLAGS_TEST := -C $(CFG_DIR)/sim6502_with_oam.cfg sim6502.lib
 
 RM := rm -rf
 MAKEFLAGS += --no-print-directory
@@ -44,7 +52,19 @@ $(NAME): $(OBJS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.s
 	$(DIR_UP)
-	$(CA) $(CFLAGS) -o $@ $<
+	$(CA) $(CFLAGS) -o $@ $^
+
+test: $(TEST_PRGS)
+	$(MKDIR) $(BIN_DIR)
+	sim6502 -c -v $(TEST_PRGS)
+
+$(BIN_DIR)/test_%.prg: $(OBJ_DIR)/test_%.o $(OBJ_DIR)/%.o
+	$(MKDIR) $(BIN_DIR)
+	$(LD) $(LFLAGS_TEST) -o $@ $^
+
+$(OBJ_DIR)/test_%.o: $(TEST_DIR)/%.s
+	$(DIR_UP)
+	$(CA) $(CFLAGS) $(CFLAGS_TEST) -o $@ $^
 
 clean:
 	$(RM) $(OBJ_DIR)

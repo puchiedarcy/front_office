@@ -1,6 +1,5 @@
-.include "../test.inc"
-
-.include "../../lib/ppu/ppu.inc"
+.include "test.inc"
+.include "ppu.inc"
 .import oam
 .import move_all_sprites_off_screen
 .import wait_for_vblank
