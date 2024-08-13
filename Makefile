@@ -42,7 +42,7 @@ CFLAGS_TEST := -t sim6502
 
 LD := ld65
 LFLAGS := -C $(CFG_DIR)/front_office.cfg -Ln $(BIN_DIR)/front_office.labels -m $(BIN_DIR)/front_office.map
-LFLAGS_TEST := -C $(CFG_DIR)/sim6502_with_oam.cfg sim6502.lib obj/parameters.o
+LFLAGS_TEST := -C $(CFG_DIR)/sim6502_with_oam.cfg sim6502.lib
 
 RM := rm -rf
 MAKEFLAGS += --no-print-directory
@@ -66,7 +66,7 @@ test: $(TEST_PRGS)
 
 $(BIN_DIR)/test_main.prg:
 
-$(BIN_DIR)/test_%.prg: $(OBJ_DIR)/test_%.o $(OBJ_DIR)/%.o
+$(BIN_DIR)/test_%.prg: $(OBJ_DIR)/test_%.o $(OBJ_DIR)/%.o $(OBJ_DIR)/parameters.o
 	$(MKDIR) $(BIN_DIR)
 	$(LD) $(LFLAGS_TEST) -o $@ $^
 	sim65 -c -v $@
