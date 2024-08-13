@@ -56,7 +56,7 @@ reset:
     jsr wait_for_vblank
 
     ; Clear background with empty tile FF
-    lda #1
+    lda #0
     sta a1
     lda #(PPU_ADDR_NAMETABLE_HI)
     sta a1+1
@@ -68,6 +68,7 @@ reset:
         :
             sta PPU_DATA_ADDR
             inx
+            cpx #$F0
             bne :-
         dey
         bne :--
@@ -79,6 +80,8 @@ reset:
     sta a1+1
     jsr set_ppu_addr
     lda #PPU_COLOR_BLACK
+    sta PPU_DATA_ADDR
+    lda #PPU_COLOR_PINK
     sta PPU_DATA_ADDR
 
     ; Turn on rendering
@@ -140,7 +143,7 @@ nmi:
 
     ; Clear PPU write flag before setting scroll
     bit PPU_STATUS_ADDR
-    lda #0
+    lda money_total
     sta PPU_SCROLL_ADDR ; Set X scroll
     sta PPU_SCROLL_ADDR ; Set Y scroll
 
