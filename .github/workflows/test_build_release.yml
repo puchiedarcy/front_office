@@ -1,0 +1,54 @@
+name: Test, Build, and Release
+permissions:
+  contents: write
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - main
+jobs:
+  test:
+    name: Run tests.
+    runs-on: ubuntu-latest
+    steps:
+    - name : Install dependencies.
+      run: sudo apt-get install cc65
+    - name: Checkout code.
+      uses: actions/checkout@v4
+    - name: Run tests.
+      run: make test
+  build:
+    name: Build ROM.
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install dependencies.
+      run: sudo apt-get install cc65
+    - name: Checkout code.
+      uses: actions/checkout@v4
+    - name: Make ROM.
+      run: make
+    - name: Upload ROM.
+      uses: actions/upload-artifact@v4
+      with:
+        name: rom
+        path: bin/front_office.nes
+  release:
+    name: Release ROM.
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code.
+      uses: actions/checkout@v4
+    - name: Download ROM.
+      uses: actions/download-artifact@v4
+      with:
+        name: rom
+        path: docs/
+    - name: Commit ROM.
+      run: |
+        git config --global user.email "puchiedarcy@users.noreply.github.com"
+        git config --global user.name "Zachary Layman"
+        git add docs/front_office.nes
+        git commit -m "Releasing latest ROM."
+        git push
