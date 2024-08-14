@@ -1,4 +1,4 @@
-name: Test, Build, and Publish
+name: Test, Build, and Release
 permissions:
   contents: write
 on:
@@ -33,8 +33,8 @@ jobs:
       with:
         name: rom
         path: bin/front_office.nes
-  publish:
-    name: Publish ROM.
+  release:
+    name: Release ROM.
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -46,11 +46,9 @@ jobs:
         name: rom
         path: docs/
     - name: Commit ROM.
-      env:
-        REPO_KEY: ${{secrets.PUBLISH_ROM_TOKEN}}
       run: |
         git config --global user.email "puchiedarcy@users.noreply.github.com"
         git config --global user.name "Zachary Layman"
         git add docs/front_office.nes
-        git commit -m "Publishing newest ROM."
+        git commit -m "Releasing latest ROM."
         git push
