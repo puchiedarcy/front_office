@@ -43,7 +43,6 @@ jobs:
       with:
         name: rom
     - name: Commit ROM.
-      run:
+      run: |
         git add front_office.nes
         git commit -m "Publishing newest ROM."
-        
