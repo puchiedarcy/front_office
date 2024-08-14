@@ -13,7 +13,7 @@ jobs:
       run: sudo apt-get install cc65
     - name: Checkout code.
       uses: actions/checkout@v4
-    - name: make test
+    - name: Run tests.
       run: make test
   build:
     name: Build ROM.
@@ -50,3 +50,4 @@ jobs:
         git config --global user.name "Zachary Layman"
         git add front_office.nes
         git commit -m "Publishing newest ROM."
+        git push
