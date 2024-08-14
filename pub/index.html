@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <body bgcolor="#b2b4b2">
+    <script type="text/javascript" src="fceux.js"></script>
+    <div style="width: 800px; height: 800px; text-align: center; margin: auto;">
+      D-pad: WASD |
+      B/A: , and . |
+      Start: Enter |
+      Select: Space
+      <br>
+      <br>
+      <div id="button" onclick="start()" style="display: none">
+        <img src="title_screen.png">
+      </div>
+      <canvas id="mycanvas"></canvas>
+    </div>
+
+    <script>
+      const button = document.querySelector('#button');
+
+      function start() {
+        button.style.display = 'none';
+
+        fceux.init('#mycanvas');
+        fceux.setConfig('video-ntsc', true)
+        fceux.downloadGame('front_office.nes');
+
+        function updateLoop() {
+          window.requestAnimationFrame(updateLoop);
+          fceux.update();
+        }
+        window.requestAnimationFrame(updateLoop);
+
+        const keys = [
+          ['Period', 'A'],
+          ['Comma', 'B'],
+          ['Space', 'Select'],
+          ['Enter', 'Start'],
+          ['KeyW', 'Up'],
+          ['KeyS', 'Down'],
+          ['KeyA', 'Left'],
+          ['KeyD', 'Right'],
+        ];
+        let bits = 0;
+        function keyHandler(ev) {
+          for (let i = 0; i < keys.length; ++i) {
+            if (ev.code == keys[i][0]) {
+              if (ev.type == 'keydown') {
+                bits |= 1 << i;
+              } else {
+                bits &= ~(1 << i);
+              }
+              fceux.setControllerBits(bits);
+              ev.preventDefault();
+            }
+          }
+        }
+        window.addEventListener('keydown', keyHandler);
+        window.addEventListener('keyup', keyHandler);
+      }
+
+      FCEUX().then((fceux_) => {
+        fceux = fceux_;
+        button.style.display = 'block';
+      });
+    </script>
+  </body>
+</html>
