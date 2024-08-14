@@ -38,20 +38,19 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout publish site.
+    - name: Checkout code.
       uses: actions/checkout@v4
-      with:
-        repository: "puchiedarcy/puchiedarcy.github.io"
     - name: Download ROM.
       uses: actions/download-artifact@v4
       with:
         name: rom
+        path: docs/
     - name: Commit ROM.
       env:
         REPO_KEY: ${{secrets.PUBLISH_ROM_TOKEN}}
       run: |
         git config --global user.email "puchiedarcy@users.noreply.github.com"
         git config --global user.name "Zachary Layman"
-        git add front_office.nes
+        git add docs/front_office.nes
         git commit -m "Publishing newest ROM."
-        git push https://puchiedarcy:$REPO_KEY@github.com/puchiedarcy/puchiedarcy.github.io.git
+        git push
