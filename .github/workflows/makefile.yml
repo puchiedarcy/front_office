@@ -46,5 +46,7 @@ jobs:
         name: rom
     - name: Commit ROM.
       run: |
+        git config --global user.email "puchiedarcy@users.noreply.github.com"
+        git config --global user.name "Zachary Layman"
         git add front_office.nes
         git commit -m "Publishing newest ROM."
