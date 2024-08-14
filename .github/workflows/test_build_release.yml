@@ -1,11 +1,12 @@
 name: Test, Build, and Release
-permissions:
-  contents: write
 on:
   workflow_dispatch:
   push:
     branches:
     - main
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 jobs:
   test:
     name: Run tests.
@@ -33,9 +34,15 @@ jobs:
       with:
         name: rom
         path: bin/front_office.nes
-  release:
-    name: Release ROM.
+  publish:
+    name: Publish.
     needs: build
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code.
@@ -45,10 +52,12 @@ jobs:
       with:
         name: rom
         path: docs/
-    - name: Commit ROM.
-      run: |
-        git config --global user.email "puchiedarcy@users.noreply.github.com"
-        git config --global user.name "Zachary Layman"
-        git add docs/front_office.nes
-        git commit -m "Releasing latest ROM."
-        git push
+    - name: Compress site.
+      run: tar -czvf github-pages docs/*
+    - name: Publish to GitHub Pages.
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: 'docs/'
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
