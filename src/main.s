@@ -81,7 +81,7 @@ reset:
     jsr set_ppu_addr
     lda #PPU_COLOR_BLACK
     sta PPU_DATA_ADDR
-    lda #PPU_COLOR_LIME
+    lda #PPU_COLOR_PINK
     sta PPU_DATA_ADDR
 
     ; Turn on rendering
