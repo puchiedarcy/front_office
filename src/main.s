@@ -4,6 +4,7 @@
 .include "money.inc"
 .importzp money_total
 .import add_money
+.import print_money
 
 .include "controller.inc"
 .importzp controller1
@@ -48,6 +49,7 @@ reset:
     jsr disable_interrupt_requests
     jsr disable_decimal_mode
     jsr clear_ram
+    sta vram_index
 
     ; Disable API IRQ
     ldx #%01000000
@@ -113,6 +115,7 @@ main:
     lda #>add_money
     sta a1+1
     jsr on_press_goto
+    jsr print_money
 
     lda #(BUTTON_A | BUTTON_B)
     sta p1

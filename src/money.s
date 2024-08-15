@@ -17,7 +17,10 @@ money_total: .res 1
 .export add_money
 add_money:
     inc money_total
+    rts
 
+.export print_money
+print_money:
     lda money_total
     sta p4
     jsr double_dabble
