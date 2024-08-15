@@ -9,55 +9,54 @@ concurrency:
   cancel-in-progress: false
 jobs:
   test:
-    name: Run tests.
+    name: Test
     runs-on: ubuntu-latest
     steps:
-    - name : Install dependencies.
+    - name : Install cc65
       run: sudo apt-get install cc65
     - name: Checkout code.
       uses: actions/checkout@v4
     - name: Run tests.
       run: make test
   build:
-    name: Build ROM.
-    needs: test
+    name: Build
     runs-on: ubuntu-latest
     steps:
-    - name: Install dependencies.
+    - name: Install cc65
       run: sudo apt-get install cc65
-    - name: Checkout code.
+    - name: Checkout code
       uses: actions/checkout@v4
     - name: Make ROM.
       run: make
-    - name: Upload ROM.
+    - name: Upload ROM
       uses: actions/upload-artifact@v4
       with:
         name: rom
         path: bin/front_office.nes
   publish:
-    name: Publish.
+    name: Publish
     needs: build
     permissions:
-      pages: write      # to deploy to Pages
+      pages: write
       id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code.
+    - name: Checkout code
       uses: actions/checkout@v4
-    - name: Download ROM.
+    - name: Download ROM
       uses: actions/download-artifact@v4
       with:
         name: rom
-        path: docs/
-    - name: Compress site.
-      run: tar -czvf github-pages docs/*
-    - name: Publish to GitHub Pages.
+        path: pub/
+    - name: Compress
+      run: tar -czvf github-pages pub/*
+    - name: Upload
       uses: actions/upload-pages-artifact@v3
       with:
         path: 'pub/'
-    - name: Deploy to GitHub Pages
+    - name: Deploy
       id: deployment
       uses: actions/deploy-pages@v4
