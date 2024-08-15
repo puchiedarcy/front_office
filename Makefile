@@ -87,7 +87,7 @@ re:
 	$(MAKE) test
 	$(MAKE) all
 
-run: re
+run: all
 	-$(FCEUX) $(NES_FILE)
 
 MAKEFLAGS += --no-print-directory
