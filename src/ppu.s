@@ -2,6 +2,15 @@
 
 .importzp a1
 
+.segment "VRAM"
+.export vram
+vram:
+    .res 127
+
+.export vram_index
+vram_index:
+    .res 1, 0
+
 .segment "OAM"
 .export oam
 oam:
