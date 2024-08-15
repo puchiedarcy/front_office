@@ -32,6 +32,8 @@ LABELS := $(BIN_DIR)/$(NAME).labels
 MAP_MAKER := $(UTIL_DIR)/map_maker.sh
 MAP := $(BIN_DIR)/$(NAME).map
 SPACE_USED := $(BIN_DIR)/$(NAME)_space_used.json
+REPORT_CARD_MAKER := $(UTIL_DIR)/report_card_maker.sh
+REPORT_CARD := $(BIN_DIR)/$(NAME)_report_card.json
 
 MKDIR := mkdir -p
 RM := rm -rf
@@ -63,9 +65,10 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.s
 	$(CA) $(CFLAGS) $@ $^
 
 test: $(TEST_RESULTS)
+	$(REPORT_CARD_MAKER) $(BIN_DIR) $(REPORT_CARD)
 
 $(BIN_DIR)/test_%.results: $(BIN_DIR)/test_%.prg
-	$(SIM) $(SFLAGS) $^ $(SOUT)
+	-$(SIM) $(SFLAGS) $^ $(SOUT)
 
 $(BIN_DIR)/test_%.prg: $(OBJ_DIR)/test_%.o $(OBJ_DIR)/%.o $(OBJ_DIR)/parameters.o
 	$(DIR_UP)
@@ -86,8 +89,6 @@ re:
 
 run: re
 	-$(FCEUX) $(NES_FILE)
-
-
 
 MAKEFLAGS += --no-print-directory
 .PHONY: all clean re run test
