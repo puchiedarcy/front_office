@@ -47,9 +47,11 @@ double_dabble:
 
     :
     clc
+    php
     ldx dd_binary_size
     dex
     :
+        plp
         rol dd_binary,x
         php
         dex

@@ -25,10 +25,11 @@ add_money:
 print_money:
     lda #255
     sta dd_binary
+    sta dd_binary+1
 
-    lda #DD_BINARY_NUMBER_SIZE_1
+    lda #DD_BINARY_NUMBER_SIZE_2
     sta dd_binary_size
-    lda #DD_DECIMAL_NUMBER_SIZE_1
+    lda #DD_DECIMAL_NUMBER_SIZE_2
     sta dd_decimal_size
 
     jsr double_dabble
@@ -36,12 +37,12 @@ print_money:
     ldx vram_index
     lda #2
     clc
-    adc #DD_DECIMAL_NUMBER_SIZE_1
+    adc #DD_DECIMAL_NUMBER_SIZE_2
     sta vram,x
     inx
     lda #<MONEY_TOTAL_END_PPU_ADDR
     sec
-    sbc #DD_DECIMAL_NUMBER_SIZE_1
+    sbc #DD_DECIMAL_NUMBER_SIZE_2
     clc
     adc #1
     sta vram,x
