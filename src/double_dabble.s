@@ -18,7 +18,7 @@ dd_decimal_start_index: .res 1
 double_dabble:
     lda #27
     sec
-    sbc #3
+    sbc #5
     sta dd_decimal_start_index
 
     ; Zero-out all decimal bytes
@@ -34,6 +34,7 @@ double_dabble:
     ldy #0
     :
     clc
+    rol dd_binary+1
     rol dd_binary
     php
     ldx #26
@@ -64,6 +65,6 @@ double_dabble:
     bne :--
 
     iny
-    cpy #8
+    cpy #16
     bne :----
     rts
