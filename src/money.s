@@ -1,4 +1,5 @@
 .include "money.inc"
+.include "double_dabble.inc"
 
 .ZEROPAGE
 .exportzp money_total
@@ -7,6 +8,8 @@ money_total: .res 1
 .importzp dd_binary
 .importzp dd_decimal
 .importzp dd_decimal_start_index
+.importzp dd_decimal_size
+.importzp dd_binary_size
 
 .CODE
 .import vram
@@ -22,14 +25,25 @@ add_money:
 print_money:
     lda #255
     sta dd_binary
-    sta dd_binary+1
+
+    lda #DD_BINARY_NUMBER_SIZE_1
+    sta dd_binary_size
+    lda #DD_DECIMAL_NUMBER_SIZE_1
+    sta dd_decimal_size
+
     jsr double_dabble
 
     ldx vram_index
-    lda #7
+    lda #2
+    clc
+    adc #DD_DECIMAL_NUMBER_SIZE_1
     sta vram,x
     inx
-    lda #<MONEY_TOTAL_END_PPU_ADDR-4
+    lda #<MONEY_TOTAL_END_PPU_ADDR
+    sec
+    sbc #DD_DECIMAL_NUMBER_SIZE_1
+    clc
+    adc #1
     sta vram,x
     inx
     lda #>MONEY_TOTAL_END_PPU_ADDR

@@ -1,6 +1,5 @@
 .include "double_dabble.inc"
 
-
 .ZEROPAGE
 .importzp p1
 .importzp p4
@@ -9,6 +8,10 @@
 dd_decimal: .res 27
 .exportzp dd_binary
 dd_binary: .res 11
+.exportzp dd_decimal_size
+dd_decimal_size: .res 1
+.exportzp dd_binary_size
+dd_binary_size: .res 1
 .exportzp dd_decimal_start_index
 dd_decimal_start_index: .res 1
 
@@ -18,7 +21,7 @@ dd_decimal_start_index: .res 1
 double_dabble:
     lda #27
     sec
-    sbc #5
+    sbc dd_decimal_size
     sta dd_decimal_start_index
 
     ; Zero-out all decimal bytes
@@ -31,12 +34,27 @@ double_dabble:
     bne :-
 
     ; For each binary bit
-    ldy #0
+    lda dd_binary_size
+    clc
+    adc dd_binary_size
+    adc dd_binary_size
+    adc dd_binary_size
+    adc dd_binary_size
+    adc dd_binary_size
+    adc dd_binary_size
+    adc dd_binary_size
+    tay
+
     :
     clc
-    rol dd_binary+1
-    rol dd_binary
-    php
+    ldx dd_binary_size
+    dex
+    :
+        rol dd_binary,x
+        php
+        dex
+        cpx #$FF
+        bne :-
     ldx #26
     :
         plp
@@ -64,7 +82,7 @@ double_dabble:
         cpx dd_decimal_start_index
     bne :--
 
-    iny
-    cpy #16
-    bne :----
+    dey
+    cpy #0
+    bne :-----
     rts
