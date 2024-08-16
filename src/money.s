@@ -4,10 +4,8 @@
 .exportzp money_total
 money_total: .res 1
 
-.importzp p1
-.importzp p2
-.importzp p3
-.importzp p4
+.importzp dd_binary
+.importzp dd_decimal
 
 .CODE
 .import vram
@@ -22,7 +20,7 @@ add_money:
 .export print_money
 print_money:
     lda money_total
-    sta p4
+    sta dd_binary
     jsr double_dabble
 
     ldx vram_index
@@ -35,13 +33,13 @@ print_money:
     lda #>MONEY_TOTAL_END_PPU_ADDR
     sta vram,x
     inx
-    lda p1
+    lda dd_decimal+24
     sta vram,x
     inx
-    lda p2
+    lda dd_decimal+25
     sta vram,x
     inx
-    lda p3
+    lda dd_decimal+26
     sta vram,x
     inx
     stx vram_index
