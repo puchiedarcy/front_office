@@ -5,10 +5,11 @@
 .importzp p1
 .importzp p4
 
-.export dd_decimal
+.exportzp dd_decimal
 dd_decimal: .res 27
-.export dd_binary
+.exportzp dd_binary
 dd_binary: .res 11
+.exportzp dd_decimal_start_index
 dd_decimal_start_index: .res 1
 
 .CODE
