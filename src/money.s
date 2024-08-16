@@ -20,15 +20,16 @@ add_money:
 
 .export print_money
 print_money:
-    lda money_total
+    lda #255
     sta dd_binary
+    sta dd_binary+1
     jsr double_dabble
 
     ldx vram_index
-    lda #5
+    lda #7
     sta vram,x
     inx
-    lda #<MONEY_TOTAL_END_PPU_ADDR-2
+    lda #<MONEY_TOTAL_END_PPU_ADDR-4
     sta vram,x
     inx
     lda #>MONEY_TOTAL_END_PPU_ADDR
