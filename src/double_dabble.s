@@ -1,35 +1,68 @@
 .include "double_dabble.inc"
 
+
+.ZEROPAGE
 .importzp p1
 .importzp p4
+
+.export dd_decimal
+dd_decimal: .res 27
+.export dd_binary
+dd_binary: .res 11
+dd_decimal_start_index: .res 1
 
 .CODE
 ; Converts a binary number to its decimal form
 .export double_dabble
 double_dabble:
+    lda #27
+    sec
+    sbc #3
+    sta dd_decimal_start_index
+
     ; Zero-out all decimal bytes
     lda #0
-    .repeat 3, i
-        sta p1+i
-    .endrepeat
+    ldx dd_decimal_start_index
+    :
+        sta dd_decimal,x
+        inx
+        cpx #27
+    bne :-
 
     ; For each binary bit
-    .repeat 8
-        clc
-        rol p4
-        .repeat 3, i
-            rol p1+2-i
-        .endrepeat
+    ldy #0
+    :
+    clc
+    rol dd_binary
+    php
+    ldx #26
+    :
+        plp
+        rol dd_decimal,x
+        php
+        dex
+        cpx dd_decimal_start_index
+    bne :-
+    plp
+    rol dd_decimal,x
 
-        ; Process any carry values
-        .repeat 2, i
-            lda p1+2-i
-            cmp #10
-            bcc :+
-                sbc #10
-                sta p1+2-i
-                inc p1+1-i
-                :
-        .endrepeat
-    .endrepeat
+    ;Process carry values
+    ldx #26
+    :
+        lda dd_decimal,x
+        cmp #10
+        bcc :+
+            sbc #10
+            sta dd_decimal,x
+            dex
+            inc dd_decimal,x
+            inx
+        :
+        dex
+        cpx dd_decimal_start_index
+    bne :--
+
+    iny
+    cpy #8
+    bne :----
     rts
