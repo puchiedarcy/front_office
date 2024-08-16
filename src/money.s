@@ -6,6 +6,7 @@ money_total: .res 1
 
 .importzp dd_binary
 .importzp dd_decimal
+.importzp dd_decimal_start_index
 
 .CODE
 .import vram
@@ -33,15 +34,15 @@ print_money:
     lda #>MONEY_TOTAL_END_PPU_ADDR
     sta vram,x
     inx
-    lda dd_decimal+24
-    sta vram,x
-    inx
-    lda dd_decimal+25
-    sta vram,x
-    inx
-    lda dd_decimal+26
-    sta vram,x
-    inx
+ 
+    ldy dd_decimal_start_index
+    :
+        lda dd_decimal,y
+        sta vram,x
+        iny
+        inx
+        cpy #27
+        bne :-
     stx vram_index
 
     rts
