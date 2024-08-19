@@ -70,6 +70,8 @@ test: $(TEST_RESULTS)
 $(BIN_DIR)/test_%.results: $(BIN_DIR)/test_%.prg
 	-$(SIM) $(SFLAGS) $^ $(SOUT)
 
+$(BIN_DIR)/test_money.prg: $(OBJ_DIR)/double_dabble.o $(OBJ_DIR)/ppu.o
+
 $(BIN_DIR)/test_%.prg: $(OBJ_DIR)/test_%.o $(OBJ_DIR)/%.o $(OBJ_DIR)/parameters.o
 	$(DIR_UP)
 	$(LD) $(LFLAGS_TEST) $@ $^
@@ -87,7 +89,7 @@ re:
 	$(MAKE) test
 	$(MAKE) all
 
-run: re
+run: all
 	-$(FCEUX) $(NES_FILE)
 
 MAKEFLAGS += --no-print-directory

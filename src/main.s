@@ -4,6 +4,7 @@
 .include "money.inc"
 .importzp money_total
 .import add_money
+.import print_money
 
 .include "controller.inc"
 .importzp controller1
@@ -11,6 +12,7 @@
 .import on_press_goto
 
 .include "double_dabble.inc"
+.import double_dabble
 
 .include "header.inc"
 
@@ -21,13 +23,22 @@
 
 .include "parameters.inc"
 .importzp p1
+.importzp p2
+.importzp p3
+.importzp p4
 .importzp a1
 
 .include "ppu.inc"
 .import oam
+.import vram
+.import vram_index
 .import move_all_sprites_off_screen
 .import wait_for_vblank
 .import set_ppu_addr
+
+.ZEROPAGE
+main_has_finished_this_frame:
+    .res 1, 0
 
 .CODE
 reset:
@@ -38,6 +49,7 @@ reset:
     jsr disable_interrupt_requests
     jsr disable_decimal_mode
     jsr clear_ram
+    sta vram_index
 
     ; Disable API IRQ
     ldx #%01000000
@@ -73,6 +85,7 @@ reset:
         dey
         bne :--
 
+    ; Need to put into PPU buffer for NMI
     ; Set universal background color
     lda #PPU_ADDR_PALETTE_UNIVERSAL_BG
     sta a1
@@ -91,20 +104,18 @@ reset:
     sta PPU_CONTROLLER_ADDR
 
 main:
-    lda #0
-    sta PPU_CONTROLLER_ADDR
+    lda main_has_finished_this_frame
+    cmp #1
+    beq main
 
-    lda money_total
-    sta dd_binary
-    jsr double_dabble
-
-    lda #(PPU_CONTROLLER_ENABLE_NMI)
-    sta PPU_CONTROLLER_ADDR
-
-    jmp main
-
-nmi:
-    jsr read_controller1
+    lda #BUTTON_A
+    sta p1
+    lda #<add_money
+    sta a1
+    lda #>add_money
+    sta a1+1
+    jsr on_press_goto
+    jsr print_money
 
     lda #(BUTTON_A | BUTTON_B)
     sta p1
@@ -114,26 +125,35 @@ nmi:
     sta a1+1
     jsr on_press_goto
 
-    lda #BUTTON_A
+    inc main_has_finished_this_frame
+    jmp main
+
+nmi:
+    ldx #0
+    ; Get Length
+    lda vram,x
     sta p1
-    lda #<add_money
-    sta a1
-    lda #>add_money
-    sta a1+1
-    jsr on_press_goto
+    cmp #0
+    beq :++
+        inx
+        lda vram,x
+        sta a1
+        inx
+        lda vram,x
+        sta a1+1
+        jsr set_ppu_addr
 
-    lda #<MONEY_TOTAL_END_PPU_ADDR-2
-    sta a1
-    lda #>MONEY_TOTAL_END_PPU_ADDR
-    sta a1+1
-    jsr set_ppu_addr
-
-    lda dd_decimal
-    sta PPU_DATA_ADDR
-    lda dd_decimal+1
-    sta PPU_DATA_ADDR
-    lda dd_decimal+2
-    sta PPU_DATA_ADDR
+        :
+        cpx p1
+        beq :+
+            inx
+            lda vram,x
+            sta PPU_DATA_ADDR
+            jmp :-
+:
+    lda #0
+    sta vram_index
+    sta vram
 
     ; Sprite DMA
     lda #0
@@ -143,11 +163,21 @@ nmi:
 
     ; Clear PPU write flag before setting scroll
     bit PPU_STATUS_ADDR
-    lda money_total
+    lda #0
     sta PPU_SCROLL_ADDR ; Set X scroll
     sta PPU_SCROLL_ADDR ; Set Y scroll
 
+    ; APU
+
+    jsr read_controller1
+
+    lda main_has_finished_this_frame
+    cmp #0
+    beq :+
+        dec main_has_finished_this_frame
+    :
     rti
+
 irq:
     rti
 
