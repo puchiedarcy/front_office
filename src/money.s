@@ -5,13 +5,15 @@
 .exportzp money_total
 money_total: .res 1
 
+.CODE
 .importzp dd_binary
 .importzp dd_decimal
 .importzp dd_decimal_start_index
 .importzp dd_decimal_size
 .importzp dd_binary_size
 
-.CODE
+.import dd_decimal_size_map
+
 .import vram
 .import vram_index
 .import double_dabble
@@ -23,12 +25,13 @@ add_money:
 
 .export print_money
 print_money:
-    lda money_total
-    sta dd_binary
+    ldx #1
+    stx dd_binary_size
 
-    lda #1
-    sta dd_binary_size
-    lda #DD_DECIMAL_NUMBER_SIZE_1
+    lda money_total
+    dex
+    sta dd_binary,x
+    lda dd_decimal_size_map,x
     sta dd_decimal_size
 
     jsr double_dabble
@@ -36,12 +39,12 @@ print_money:
     ldx vram_index
     lda #2
     clc
-    adc #DD_DECIMAL_NUMBER_SIZE_2
+    adc dd_decimal_size
     sta vram,x
     inx
     lda #<MONEY_TOTAL_END_PPU_ADDR
     sec
-    sbc #DD_DECIMAL_NUMBER_SIZE_2
+    sbc dd_decimal_size
     clc
     adc #1
     sta vram,x

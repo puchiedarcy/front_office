@@ -1,9 +1,6 @@
 .include "double_dabble.inc"
 
 .ZEROPAGE
-.importzp p1
-.importzp p4
-
 .exportzp dd_decimal
 dd_decimal: .res 27
 .exportzp dd_binary
@@ -14,6 +11,11 @@ dd_decimal_size: .res 1
 dd_binary_size: .res 1
 .exportzp dd_decimal_start_index
 dd_decimal_start_index: .res 1
+
+.RODATA
+.export dd_decimal_size_map
+dd_decimal_size_map:
+.byte 3, 5, 8, 10, 13, 15, 17, 20, 22, 25, 27
 
 .CODE
 ; Converts a binary number to its decimal form

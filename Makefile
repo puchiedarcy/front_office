@@ -3,15 +3,15 @@ NAME := front_office
 NES_FILE := $(BIN_DIR)/$(NAME).nes
 
 SRCS := \
-		apu.s \
-		controller.s \
-		double_dabble.s \
-		header.s \
-		init.s \
-		main.s \
-		money.s \
-		parameters.s \
-		ppu.s
+	apu.s \
+	controller.s \
+	double_dabble.s \
+	header.s \
+	init.s \
+	main.s \
+	money.s \
+	parameters.s \
+	ppu.s
 TESTS := $(filter-out header.s main.s parameters.s, $(SRCS))
 
 SRC_DIR := src
@@ -65,7 +65,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.s
 	$(CA) $(CFLAGS) $@ $^
 
 test: $(TEST_RESULTS)
-	$(REPORT_CARD_MAKER) $(BIN_DIR) $(REPORT_CARD)
+	$(REPORT_CARD_MAKER) $(BIN_DIR) $(REPORT_CARD) $(TEST_DIR)
 
 $(BIN_DIR)/test_%.results: $(BIN_DIR)/test_%.prg
 	-$(SIM) $(SFLAGS) $^ $(SOUT)
@@ -79,6 +79,26 @@ $(BIN_DIR)/test_%.prg: $(OBJ_DIR)/test_%.o $(OBJ_DIR)/%.o $(OBJ_DIR)/parameters.
 $(OBJ_DIR)/test_%.o: $(TEST_DIR)/%.s
 	$(DIR_UP)
 	$(CA) $(CFLAGS) $@ $^
+
+PERFS := \
+	double_dabble.s
+PERF_DIR := perf
+PERF_RESULTS := $(PERFS:%.s=$(BIN_DIR)/perf_%.results)
+
+PERF_REPORT_CARD := $(BIN_DIR)/$(NAME)_perf_report_card.json
+perf: $(PERF_RESULTS)
+	$(REPORT_CARD_MAKER) $(BIN_DIR) $(PERF_REPORT_CARD) $(PERF_DIR)
+
+$(BIN_DIR)/perf_%.results: $(BIN_DIR)/perf_%.prg
+	-$(SIM) $(SFLAGS) $^ $(SOUT)
+
+$(BIN_DIR)/perf_%.prg: $(OBJ_DIR)/perf_%.o $(OBJ_DIR)/%.o
+	$(DIR_UP)
+	$(LD) $(LFLAGS_TEST) $@ $^
+
+$(OBJ_DIR)/perf_%.o: $(PERF_DIR)/%.s
+	$(DIR_UP)
+	$(CA) $(CFLAGS) $@ $^ -D NUM_BINARY_BYTES=11
 
 clean:
 	$(RM) $(OBJ_DIR)

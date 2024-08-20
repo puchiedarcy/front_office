@@ -5,7 +5,7 @@ declare -a tests
 declare -A error_codes
 declare -A cycles
 
-for _RESULT in "$1/test_"*".results"; do
+for _RESULT in "$1/$3_"*".results"; do
     while IFS= read -r line; do
         if [[ $line =~ ^.*_(.*)+\.prg.* ]]; then
             _TEST=${BASH_REMATCH[1]}
