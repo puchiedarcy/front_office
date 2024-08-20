@@ -80,25 +80,30 @@ $(OBJ_DIR)/test_%.o: $(TEST_DIR)/%.s
 	$(DIR_UP)
 	$(CA) $(CFLAGS) $@ $^
 
-PERFS := \
-	double_dabble.s
 PERF_DIR := perf
-PERF_RESULTS := $(PERFS:%.s=$(BIN_DIR)/perf_%.results)
+PERF_DD_NUM_BINARY_BYTES := 01 02 03 04 05 06 07 08 09 0A 0B
+
+define perf_double_dabble_template =
+PERF_RESULTS += $$(BIN_DIR)/perf_double_dabble_$(1).results
+
+$$(BIN_DIR)/perf_double_dabble_$(1).results: $$(BIN_DIR)/perf_double_dabble_$(1).prg
+	-$$(SIM) $$(SFLAGS) $$^ $$(SOUT)
+
+$$(BIN_DIR)/perf_double_dabble_$(1).prg: $$(OBJ_DIR)/perf_double_dabble_$(1).o $$(OBJ_DIR)/double_dabble.o
+	$$(DIR_UP)
+	$$(LD) $$(LFLAGS_TEST) $$@ $$^
+
+$$(OBJ_DIR)/perf_double_dabble_$(1).o: $$(PERF_DIR)/double_dabble.s
+	$$(DIR_UP)
+	$$(CA) $$(CFLAGS) $$@ $$^ -D NUM_BINARY_BYTES=0x$(1)
+endef
+
+$(foreach num_bytes,$(PERF_DD_NUM_BINARY_BYTES),$(eval $(call perf_double_dabble_template,$(num_bytes))))
 
 PERF_REPORT_CARD := $(BIN_DIR)/$(NAME)_perf_report_card.json
+
 perf: $(PERF_RESULTS)
 	$(REPORT_CARD_MAKER) $(BIN_DIR) $(PERF_REPORT_CARD) $(PERF_DIR)
-
-$(BIN_DIR)/perf_%.results: $(BIN_DIR)/perf_%.prg
-	-$(SIM) $(SFLAGS) $^ $(SOUT)
-
-$(BIN_DIR)/perf_%.prg: $(OBJ_DIR)/perf_%.o $(OBJ_DIR)/%.o
-	$(DIR_UP)
-	$(LD) $(LFLAGS_TEST) $@ $^
-
-$(OBJ_DIR)/perf_%.o: $(PERF_DIR)/%.s
-	$(DIR_UP)
-	$(CA) $(CFLAGS) $@ $^ -D NUM_BINARY_BYTES=11
 
 clean:
 	$(RM) $(OBJ_DIR)

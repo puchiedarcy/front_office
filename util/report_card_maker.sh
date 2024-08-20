@@ -7,7 +7,7 @@ declare -A cycles
 
 for _RESULT in "$1/$3_"*".results"; do
     while IFS= read -r line; do
-        if [[ $line =~ ^.*_(.*)+\.prg.* ]]; then
+        if [[ $line =~ [a-z]+_(.*)+\.prg.* ]]; then
             _TEST=${BASH_REMATCH[1]}
             tests+=("$_TEST")
             cycles["$_TEST"]=$_CYCLES
@@ -34,7 +34,7 @@ do
         echo "\"error_code\": \"${error_codes[$_TEST]}\"," >> $2
         echo "\"cycles\": \"${cycles[$_TEST]}\"" >> $2
     echo "}" >> $2
-    if [[ $_COUNTER < $_NUM_TESTS ]]; then
+    if [[ $_COUNTER -lt $_NUM_TESTS ]]; then
         echo "," >> $2
         (( _COUNTER++ ))
     fi
