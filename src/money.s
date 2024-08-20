@@ -21,6 +21,7 @@ money_total: .res 1
 .export add_money
 add_money:
     inc money_total
+    jsr print_money
     rts
 
 .export print_money
