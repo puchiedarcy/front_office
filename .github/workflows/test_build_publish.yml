@@ -18,6 +18,26 @@ jobs:
       uses: actions/checkout@v4
     - name: Run tests
       run: make test
+    - name: Upload test report card
+      uses: actions/upload-artifact@v4
+      with:
+        name: test_report_card
+        path: bin/front_office_test_report_card.json
+  perf:
+    name: Performance
+    runs-on: ubuntu-latest
+    steps:
+    - name : Install cc65
+      run: sudo apt-get install cc65
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Run perf
+      run: make perf
+    - name: Upload perf report card
+      uses: actions/upload-artifact@v4
+      with:
+        name: perf_report_card
+        path: bin/front_office_perf_report_card.json
   build:
     name: Build
     runs-on: ubuntu-latest
@@ -33,9 +53,17 @@ jobs:
       with:
         name: rom
         path: bin/front_office.nes
+    - name: Upload space used report
+      uses: actions/upload-artifact@v4
+      with:
+        name: space_used_report
+        path: bin/front_office_space_used.json
   publish:
     name: Publish
-    needs: build
+    needs: 
+    - test
+    - perf
+    - build
     permissions:
       pages: write
       id-token: write
@@ -46,6 +74,21 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+    - name: Download test report card
+      uses: actions/download-artifact@v4
+      with:
+        name: test_report_card
+        path: pub/
+    - name: Download perf report card
+      uses: actions/download-artifact@v4
+      with:
+        name: perf_report_card
+        path: pub/
+    - name: Download space used report
+      uses: actions/download-artifact@v4
+      with:
+        name: space_used_report
+        path: pub/
     - name: Download ROM
       uses: actions/download-artifact@v4
       with:
