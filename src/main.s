@@ -11,9 +11,6 @@
 .import read_controller1
 .import on_press_goto
 
-.include "double_dabble.inc"
-.import double_dabble
-
 .include "header.inc"
 
 .include "init.inc"

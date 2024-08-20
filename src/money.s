@@ -23,13 +23,12 @@ add_money:
 
 .export print_money
 print_money:
-    lda #255
+    lda money_total
     sta dd_binary
-    sta dd_binary+1
 
-    lda #DD_BINARY_NUMBER_SIZE_2
+    lda #1
     sta dd_binary_size
-    lda #DD_DECIMAL_NUMBER_SIZE_2
+    lda #DD_DECIMAL_NUMBER_SIZE_1
     sta dd_decimal_size
 
     jsr double_dabble
