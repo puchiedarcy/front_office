@@ -64,8 +64,10 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.s
 	$(DIR_UP)
 	$(CA) $(CFLAGS) $@ $^
 
-test: $(TEST_RESULTS)
-	$(REPORT_CARD_MAKER) $(BIN_DIR) $(REPORT_CARD) $(TEST_DIR)
+test: $(REPORT_CARD)
+
+$(REPORT_CARD): $(TEST_RESULTS)
+	$(REPORT_CARD_MAKER) $(BIN_DIR) $@ $(TEST_DIR)
 
 $(BIN_DIR)/test_%.results: $(BIN_DIR)/test_%.prg
 	-$(SIM) $(SFLAGS) $^ $(SOUT)
@@ -102,8 +104,10 @@ $(foreach num_bytes,$(PERF_DD_NUM_BINARY_BYTES),$(eval $(call perf_double_dabble
 
 PERF_REPORT_CARD := $(BIN_DIR)/$(NAME)_perf_report_card.json
 
-perf: $(PERF_RESULTS)
-	$(REPORT_CARD_MAKER) $(BIN_DIR) $(PERF_REPORT_CARD) $(PERF_DIR)
+perf: $(PERF_REPORT_CARD)
+
+$(PERF_REPORT_CARD): $(PERF_RESULTS)
+	$(REPORT_CARD_MAKER) $(BIN_DIR) $@ $(PERF_DIR)
 
 clean:
 	$(RM) $(OBJ_DIR)
