@@ -37,7 +37,7 @@ print_money:
     jsr double_dabble
 
     ldx vram_index
-    lda #2
+    lda #3
     clc
     adc dd_decimal_size
     sta vram,x
@@ -45,11 +45,12 @@ print_money:
     lda #<MONEY_TOTAL_END_PPU_ADDR
     sec
     sbc dd_decimal_size
-    clc
-    adc #1
     sta vram,x
     inx
     lda #>MONEY_TOTAL_END_PPU_ADDR
+    sta vram,x
+    inx
+    lda #$0A
     sta vram,x
     inx
  
