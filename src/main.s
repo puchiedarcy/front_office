@@ -35,7 +35,7 @@
 
 .ZEROPAGE
 main_has_finished_this_frame:
-    .res 1, 0
+    .res 1
 
 .CODE
 reset:
@@ -100,6 +100,8 @@ reset:
     lda #(PPU_CONTROLLER_ENABLE_NMI)
     sta PPU_CONTROLLER_ADDR
 
+    jsr print_money
+
 main:
     lda main_has_finished_this_frame
     cmp #1
@@ -112,7 +114,6 @@ main:
     lda #>add_money
     sta a1+1
     jsr on_press_goto
-    jsr print_money
 
     lda #(BUTTON_A | BUTTON_B)
     sta p1
@@ -126,6 +127,12 @@ main:
     jmp main
 
 nmi:
+    pha
+    txa
+    pha
+    tya
+    pha
+
     ldx #0
     ; Get Length
     lda vram,x
@@ -173,6 +180,13 @@ nmi:
     beq :+
         dec main_has_finished_this_frame
     :
+
+    pla
+    tay
+    pla
+    tax
+    pla
+
     rti
 
 irq:
