@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
   <body bgcolor="#b2b4b2">
+    <h1>Front Office</h1>
     <script type="text/javascript" src="fceux.js"></script>
     <div style="width: 800px; height: 800px; text-align: center; margin: auto;">
-        <h1>Front Office</h1>
+        <h2>Play latest build!</h2>
         D-pad: WASD |
         B/A: , and . |
         Start: Enter |
@@ -65,5 +66,46 @@
         button.style.display = 'block';
       });
     </script>
+
+    <script>
+        async function stats() {
+            var space_used_file = await fetch("front_office_space_used.json");
+            var space_used = await space_used_file.json();
+            console.log(space_used);
+
+            var perf_report_card_file = await fetch("front_office_perf_report_card.json");
+            var perf_report_card = await perf_report_card_file.json();
+            console.log(perf_report_card);
+            const perf_results = document.querySelector('#perf_results');
+            for (const perf in perf_report_card) {
+                var new_perf = document.createElement('li');
+                cycles = perf_report_card[perf].cycles;
+                new_perf.innerHTML = perf + ' ' + cycles;
+                perf_results.appendChild(new_perf);
+            }
+
+            var test_report_card_file = await fetch("front_office_test_report_card.json");
+            var test_report_card = await test_report_card_file.json();
+            console.log(test_report_card);
+            const test_results = document.querySelector('#test_results');
+            for (const test in test_report_card) {
+                var new_test = document.createElement('li');
+                new_test.innerHTML = test;
+                error_code = test_report_card[test].error_code;
+                if (error_code == 0) {
+                    new_test.style.backgroundColor = '#007243';
+                } else {
+                    new_test.style.backgroundColor = '#C1121C';
+                    new_test.innerHTML += " Error Code: " + error_code;
+                }
+                test_results.appendChild(new_test);
+            }
+        }
+        stats();
+    </script>
+    <h2>Test Results</h2>
+    <ul id="test_results" style="display:inline-block;"></ul>
+    <h2>Performance Results</h2>
+    <ul id="perf_results" style="display:inline-block;"></ul>
   </body>
 </html>
