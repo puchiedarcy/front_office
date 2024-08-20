@@ -13,6 +13,10 @@
 _main:
     lda #255
     sta dd_binary
+    lda #1
+    sta dd_binary_size
+    lda #DD_DECIMAL_NUMBER_SIZE_1
+    sta dd_decimal_size
 
     lda #1
     sta dd_binary_size

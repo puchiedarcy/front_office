@@ -33,7 +33,7 @@ MAP_MAKER := $(UTIL_DIR)/map_maker.sh
 MAP := $(BIN_DIR)/$(NAME).map
 SPACE_USED := $(BIN_DIR)/$(NAME)_space_used.json
 REPORT_CARD_MAKER := $(UTIL_DIR)/report_card_maker.sh
-REPORT_CARD := $(BIN_DIR)/$(NAME)_report_card.json
+REPORT_CARD := $(BIN_DIR)/$(NAME)_test_report_card.json
 
 MKDIR := mkdir -p
 RM := rm -rf
