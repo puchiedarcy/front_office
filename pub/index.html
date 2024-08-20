@@ -72,10 +72,22 @@
             var space_used_file = await fetch("front_office_space_used.json");
             var space_used = await space_used_file.json();
             console.log(space_used);
+            const space_used_results = document.querySelector('#space_used');
+            for (const segment in space_used) {
+                var new_segment = document.createElement('div');
+                used = space_used[segment].used;
+                size = space_used[segment].size;
+                new_segment.innerHTML = segment + ' ' + used + ' ' + size + ' ' + (parseInt(used, 16)/parseInt(size, 16)).toFixed(2) * 100 + '%';
+                for (const obj in space_used[segment].used_by_objects) {
+                    var new_obj = document.createElement('div');
+                    new_obj.innerHTML = obj + ' ' + space_used[segment].used_by_objects[obj] + ' ' + (parseInt(space_used[segment].used_by_objects[obj], 16)/parseInt(size, 16)).toFixed(2) * 100 + '%';
+                    new_segment.appendChild(new_obj);
+                }
+                space_used_results.appendChild(new_segment);
+            }
 
             var perf_report_card_file = await fetch("front_office_perf_report_card.json");
             var perf_report_card = await perf_report_card_file.json();
-            console.log(perf_report_card);
             const perf_results = document.querySelector('#perf_results');
             for (const perf in perf_report_card) {
                 var new_perf = document.createElement('li');
@@ -86,7 +98,6 @@
 
             var test_report_card_file = await fetch("front_office_test_report_card.json");
             var test_report_card = await test_report_card_file.json();
-            console.log(test_report_card);
             const test_results = document.querySelector('#test_results');
             for (const test in test_report_card) {
                 var new_test = document.createElement('li');
@@ -107,5 +118,7 @@
     <ul id="test_results" style="display:inline-block;"></ul>
     <h2>Performance Results</h2>
     <ul id="perf_results" style="display:inline-block;"></ul>
+    <h2>Space Used</h2>
+    <div id="space_used" style="display:inline-block;"></div>
   </body>
 </html>
