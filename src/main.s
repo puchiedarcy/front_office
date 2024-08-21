@@ -32,6 +32,7 @@
 .import move_all_sprites_off_screen
 .import wait_for_vblank
 .import set_ppu_addr
+.import vram_lock
 
 .ZEROPAGE
 main_has_finished_this_frame:
@@ -47,6 +48,7 @@ reset:
     jsr disable_decimal_mode
     jsr clear_ram
     sta vram_index
+    sta vram_lock
 
     ; Disable API IRQ
     ldx #%01000000
@@ -133,6 +135,10 @@ nmi:
     tya
     pha
 
+    lda vram_lock
+    cmp #0
+    bne :++
+
     ldx #0
     ; Get Length
     lda vram,x
@@ -173,11 +179,10 @@ nmi:
 
     ; APU
 
-    jsr read_controller1
-
     lda main_has_finished_this_frame
     cmp #0
     beq :+
+        jsr read_controller1
         dec main_has_finished_this_frame
     :
 

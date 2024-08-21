@@ -5,11 +5,15 @@
 .segment "VRAM"
 .export vram
 vram:
-    .res 127
+    .res 126
 
 .export vram_index
 vram_index:
-    .res 1, 0
+    .res 1
+
+.export vram_lock
+vram_lock:
+    .res 1
 
 .segment "OAM"
 .export oam
