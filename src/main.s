@@ -3,6 +3,7 @@
 
 .include "money.inc"
 .importzp money_total
+.importzp money_size
 .import add_money
 .import print_money
 
@@ -102,6 +103,7 @@ reset:
     lda #(PPU_CONTROLLER_ENABLE_NMI)
     sta PPU_CONTROLLER_ADDR
 
+    inc money_size
     jsr print_money
 
 main:
@@ -134,6 +136,8 @@ nmi:
     pha
     tya
     pha
+
+    jsr add_money
 
     lda vram_lock
     cmp #0
