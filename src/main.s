@@ -85,18 +85,6 @@ reset:
         dey
         bne :--
 
-    ; Need to put into PPU buffer for NMI
-    ; Set universal background color
-    lda #PPU_ADDR_PALETTE_UNIVERSAL_BG
-    sta a1
-    lda #PPU_ADDR_PALETTE_HI
-    sta a1+1
-    jsr set_ppu_addr
-    lda #PPU_COLOR_BLACK
-    sta PPU_DATA_ADDR
-    lda #PPU_COLOR_PINK
-    sta PPU_DATA_ADDR
-
     ; Turn on rendering
     lda #(PPU_MASK_RENDER_BACKGROUND)
     sta PPU_MASK_ADDR
@@ -105,6 +93,32 @@ reset:
 
     inc money_size
     jsr print_money
+
+    lda #1
+    sta vram_lock
+
+    ; Set universal background color
+    ldx vram_index
+    lda #4
+    sta vram,x
+    inx
+    lda #PPU_ADDR_PALETTE_UNIVERSAL_BG
+    sta vram,x
+    inx
+    lda #PPU_ADDR_PALETTE_HI
+    sta vram,x
+    inx
+    lda #PPU_COLOR_BLACK
+    sta vram,x
+    inx
+    lda #PPU_COLOR_PINK
+    sta vram,x
+    inx
+
+    stx vram_index
+
+    lda #0
+    sta vram_lock
 
 main:
     lda main_has_finished_this_frame
@@ -144,11 +158,15 @@ nmi:
     bne :++
 
     ldx #0
+    stx vram_index
     ; Get Length
+    :
     lda vram,x
+    clc
+    adc vram_index
     sta p1
-    cmp #0
-    beq :++
+    cmp vram_index
+    beq :+++
         inx
         lda vram,x
         sta a1
@@ -164,11 +182,22 @@ nmi:
             lda vram,x
             sta PPU_DATA_ADDR
             jmp :-
-:
-    lda #0
-    sta vram_index
-    sta vram
+        :
+        inx
+        stx vram_index
+        jmp :---
+    :
 
+    ldx #0
+    txa
+    sta vram_index
+    :
+    cpx p1
+    beq :+
+        sta vram,x
+        inx
+        jmp :-
+    :
     ; Sprite DMA
     lda #0
     sta PPU_OAM_ADDR
@@ -180,6 +209,8 @@ nmi:
     lda #0
     sta PPU_SCROLL_ADDR ; Set X scroll
     sta PPU_SCROLL_ADDR ; Set Y scroll
+    lda #(PPU_CONTROLLER_ENABLE_NMI) ; Bits 0 and 1 set nametable for scrolling
+    sta PPU_CONTROLLER_ADDR
 
     ; APU
 

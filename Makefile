@@ -116,6 +116,7 @@ clean:
 re:
 	$(MAKE) clean
 	$(MAKE) test
+	$(MAKE) perf
 	$(MAKE) all
 
 run: all

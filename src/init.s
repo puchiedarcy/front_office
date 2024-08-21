@@ -18,6 +18,10 @@ clear_ram:
     :
         sta $0000, x
         ; Skip $0100s (stack)
+        cpx #$80
+        bpl :+
+            sta $0100,x
+        :
         ; Skip $0200s (sim65 _main / nes oam)
         sta $0300, x
         sta $0400, x
@@ -25,5 +29,5 @@ clear_ram:
         sta $0600, x
         sta $0700, x
         inx
-        bne :-
+        bne :--
     rts
