@@ -16,6 +16,7 @@ money_total: .res 1
 
 .import vram
 .import vram_index
+.import vram_lock
 .import double_dabble
 
 .export add_money
@@ -36,6 +37,9 @@ print_money:
     sta dd_decimal_size
 
     jsr double_dabble
+
+    lda #1
+    sta vram_lock
 
     ldx vram_index
     lda #3
@@ -64,5 +68,8 @@ print_money:
         cpy #27
         bne :-
     stx vram_index
+
+    lda #0
+    sta vram_lock
 
     rts
