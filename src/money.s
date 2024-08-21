@@ -3,7 +3,10 @@
 
 .ZEROPAGE
 .exportzp money_total
-money_total: .res 1
+money_total:
+    .res 27
+.exportzp money_size
+money_size: .res 1
 
 .CODE
 .importzp dd_binary
@@ -21,35 +24,50 @@ money_total: .res 1
 
 .export add_money
 add_money:
-    inc money_total
+    ldy #1
+    ldx #26
+    sec
+    :
+    lda money_total,x
+    adc #0
+    sta money_total,x
+    cmp #10
+    bne :++
+        lda #0
+        sta money_total,x
+        iny
+        dex
+        bpl :+
+            ldx #1
+            stx money_size
+            ldy money_size
+            jmp :+++
+        :
+        sec
+        jmp :--
+    :
+    cpy money_size
+    bmi :+
+        sty money_size
+    :
+
     jsr print_money
     rts
 
 .export print_money
 print_money:
-    ldx #1
-    stx dd_binary_size
-
-    lda money_total
-    dex
-    sta dd_binary,x
-    lda dd_decimal_size_map,x
-    sta dd_decimal_size
-
-    jsr double_dabble
-
     lda #1
     sta vram_lock
 
     ldx vram_index
     lda #3
     clc
-    adc dd_decimal_size
+    adc money_size
     sta vram,x
     inx
     lda #<MONEY_TOTAL_END_PPU_ADDR
     sec
-    sbc dd_decimal_size
+    sbc money_size
     sta vram,x
     inx
     lda #>MONEY_TOTAL_END_PPU_ADDR
@@ -58,10 +76,13 @@ print_money:
     lda #$0A
     sta vram,x
     inx
- 
-    ldy dd_decimal_start_index
+
+    lda #27
+    sec
+    sbc money_size
+    tay
     :
-        lda dd_decimal,y
+        lda money_total,y
         sta vram,x
         iny
         inx
