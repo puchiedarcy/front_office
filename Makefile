@@ -123,5 +123,5 @@ run: all
 	-$(FCEUX) $(NES_FILE)
 
 MAKEFLAGS += --no-print-directory
-.PHONY: all clean re run test
+.PHONY: all clean perf re run test
 .SILENT:
